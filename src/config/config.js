@@ -1,10 +1,11 @@
-import convict from 'convict'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import url from 'node:url'
 
-import convictFormatWithValidator from 'convict-format-with-validator'
+import convict from 'convict'
 
-const dirname = path.dirname(fileURLToPath(import.meta.url))
+import * as formats from './formats.js'
+
+const dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 const fourHoursMs = 14400000
 const oneWeekMs = 604800000
@@ -13,9 +14,9 @@ const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-convict.addFormats(convictFormatWithValidator)
+convict.addFormats(formats)
 
-export const config = convict({
+const config = convict({
   serviceVersion: {
     doc: 'The service version, this variable is injected into your docker container in CDP environments',
     format: String,
@@ -56,6 +57,12 @@ export const config = convict({
     format: String,
     default: '/public',
     env: 'ASSET_PATH'
+  },
+  env: {
+    doc: 'The application environment',
+    format: ['production', 'development', 'test'],
+    default: 'development',
+    env: 'NODE_ENV'
   },
   isProduction: {
     doc: 'If this application running in the production environment',
@@ -217,3 +224,7 @@ export const config = convict({
 })
 
 config.validate({ allowed: 'strict' })
+
+export {
+  config
+}

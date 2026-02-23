@@ -1,15 +1,17 @@
-import { createRequire } from 'node:module'
-import { fileURLToPath } from 'node:url'
-import path from 'path'
+import nodeModule from 'node:module'
+import path from 'node:path'
+import url from 'node:url'
+
 import CopyPlugin from 'copy-webpack-plugin'
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
+
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { WebpackAssetsManifest } from 'webpack-assets-manifest'
 
 const { NODE_ENV = 'development' } = process.env
 
-const require = createRequire(import.meta.url)
-const dirname = path.dirname(fileURLToPath(import.meta.url))
+const require = nodeModule.createRequire(import.meta.url)
+const dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 const govukFrontendPath = path.dirname(
   require.resolve('govuk-frontend/package.json')
@@ -60,20 +62,6 @@ export default {
         test: /\.(js|mjs|scss)$/,
         loader: 'source-map-loader',
         enforce: 'pre'
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          browserslistEnv: 'javascripts',
-          cacheDirectory: true,
-          extends: path.join(dirname, 'babel.config.cjs'),
-          presets: [['@babel/preset-env']]
-        },
-
-        // Flag loaded modules as side effect free
-        sideEffects: false
       },
       {
         test: /\.scss$/,

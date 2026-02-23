@@ -1,0 +1,15 @@
+# Use this file to ignore specific vulnerabilities in Aqua Trivy scans.
+# Each entry must:
+# * Start with the vulnerability ID (e.g., CVE-YYYY-NNNN)
+# * Include an expiration date in ISO 8601 format (YYYY-MM-DD) after 'exp:'
+#
+# Example:
+# CVE-2021-12345 exp:2023-12-31
+#
+# See https://trivy.dev/docs/latest/configuration/filtering/#trivyignore
+
+# Useragent: Regular Expression Denial of Service (ReDoS)
+# Reason: Workaround (truncate user-agent strings) implemented in application code. Waiting for upstream package fix.
+# Created: 2025-11-26
+# Expires: 2026-10-31
+CVE-2020-26311 exp:2026-10-31
