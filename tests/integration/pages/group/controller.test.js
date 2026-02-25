@@ -60,6 +60,27 @@ describe('#groupController', () => {
       expect(headers.location).toBe('/group/kg_test123')
     })
 
+    test('Should return 500 error page when backend returns 500', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        text: () => Promise.resolve('Internal Server Error')
+      })
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group',
+        payload: {
+          name: 'Test Group',
+          owner: 'test-owner',
+          description: 'A test group'
+        }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+
     test('Should return 400 and show errors when fields are empty', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
