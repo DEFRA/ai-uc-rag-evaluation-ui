@@ -4,30 +4,12 @@ import { fetch } from 'undici'
 import { statusCodes } from '../../constants/status-codes.js'
 import { config } from '../../config/config.js'
 
-/**
- * Get Manage page controller
- *
- * @param {import('@hapi/hapi').Request} request - Hapi request object
- * @param {import('@hapi/hapi').ResponseToolkit} h - Hapi response toolkit
- *
- * @returns {import('@hapi/hapi').ResponseObject} The response object for the homepage
- */
-function failCreateGroup (request, h, err) {
-  const errors = Object.fromEntries(
-    err.details.map(({ path, message }) => [path[0], message])
-  )
-  return h.view('group/create_group_page.njk', {
-    errors,
-    values: request.payload
-  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
-}
-
-function getManagePage (_request, h) {
+function getAddGroupForm (_request, h) {
   return h.view('group/create_group_page.njk')
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
-async function updateManagePage (request, h) {
+async function updateGroup (request, h) {
   const { name, owner, description } = request.payload
 
   // We need to pass at least one source to the create endpoint due to schema validation (min_items=1)
@@ -54,6 +36,16 @@ async function updateManagePage (request, h) {
   return h.redirect(`/group/${group.groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
+function failCreateGroup (request, h, err) {
+  const errors = Object.fromEntries(
+    err.details.map(({ path, message }) => [path[0], message])
+  )
+  return h.view('group/create_group_page.njk', {
+    errors,
+    values: request.payload
+  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
+}
+
 function getGroupCreatedPage (request, h) {
   const { groupId } = request.params
   return h.view('group/group_created_page.njk', { groupId })
@@ -62,7 +54,7 @@ function getGroupCreatedPage (request, h) {
 
 export {
   failCreateGroup,
-  getManagePage,
-  updateManagePage,
+  getAddGroupForm,
+  updateGroup,
   getGroupCreatedPage
 }

@@ -6,7 +6,7 @@ const routes = [
   {
     method: 'GET',
     path: '/group',
-    handler: manageController.getManagePage
+    handler: manageController.getAddGroupForm
   },
   {
     method: 'POST',
@@ -21,7 +21,7 @@ const routes = [
         failAction: manageController.failCreateGroup
       }
     },
-    handler: manageController.updateManagePage
+    handler: manageController.updateGroup
   },
   {
     method: 'GET',
