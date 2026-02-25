@@ -2,6 +2,7 @@ import Boom from '@hapi/boom'
 import { fetch } from 'undici'
 
 import { statusCodes } from '../../constants/status-codes.js'
+import { config } from '../../config/config.js'
 
 /**
  * Get Manage page controller
@@ -25,7 +26,8 @@ async function updateManagePage (request, h) {
     type: 'PRECHUNKED_BLOB',
     location: 's3://placeholder',
   }]
-  const response = await fetch('http://localhost:8085/knowledge/groups', {
+  const backendRagServer = config.get('backend_rag_service')
+  const response = await fetch(backendRagServer + '/knowledge/groups', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, owner, description, sources })
@@ -37,7 +39,7 @@ async function updateManagePage (request, h) {
     throw Boom.badImplementation()
   }
   const group = await response.json()
-  console.info(`Created group ${name}`)
+  console.info(`Created group ${name} id ${group.groupId}`)
 
   return h.redirect(`/group/${group.groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
