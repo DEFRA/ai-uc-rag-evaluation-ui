@@ -1,0 +1,28 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Create knowledge group | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Create knowledge group</h1>
+
+  <form method="post" action="/group">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="name">Name</label>
+      <input class="govuk-input" id="name" name="name" type="text">
+    </div>
+
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="owner">Owner</label>
+      <input class="govuk-input" id="owner" name="owner" type="text">
+    </div>
+
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="description">Description</label>
+      <textarea class="govuk-textarea" id="description" name="description" rows="5"></textarea>
+    </div>
+
+    <button type="submit" class="govuk-button">Submit</button>
+  </form>
+{% endblock %}

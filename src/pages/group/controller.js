@@ -1,0 +1,55 @@
+import Boom from '@hapi/boom'
+import { fetch } from 'undici'
+
+import { statusCodes } from '../../constants/status-codes.js'
+
+/**
+ * Get Manage page controller
+ *
+ * @param {import('@hapi/hapi').Request} request - Hapi request object
+ * @param {import('@hapi/hapi').ResponseToolkit} h - Hapi response toolkit
+ *
+ * @returns {import('@hapi/hapi').ResponseObject} The response object for the homepage
+ */
+function getManagePage (_request, h) {
+  return h.view('group/create_group_page.njk')
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+async function updateManagePage (request, h) {
+  const { name, owner, description } = request.payload
+
+  // We need to pass at least one source to the create endpoint due to schema validation (min_items=1)
+  const sources = [{
+    name: 'AI Opportunities Action Plan',
+    type: 'PRECHUNKED_BLOB',
+    location: 's3://placeholder',
+  }]
+  const response = await fetch('http://localhost:8085/knowledge/groups', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, owner, description, sources })
+  })
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Backend request failed with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+  const group = await response.json()
+  console.info(`Created group ${name}`)
+
+  return h.redirect(`/group/${group.groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+}
+
+function getGroupCreatedPage (request, h) {
+  const { groupId } = request.params
+  return h.view('group/group_created_page.njk', { groupId })
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+export {
+  getManagePage,
+  updateManagePage,
+  getGroupCreatedPage
+}

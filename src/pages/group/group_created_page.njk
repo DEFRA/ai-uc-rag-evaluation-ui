@@ -1,0 +1,12 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Group created | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-panel govuk-panel--confirmation">
+    <h1 class="govuk-panel__title">Group created</h1>
+    <div class="govuk-panel__body">Group ID: {{ groupId }}</div>
+  </div>
+{% endblock %}

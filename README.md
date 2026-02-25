@@ -97,7 +97,7 @@ npm install
 To run the application in `development` mode run:
 
 ```bash
-npm run dev
+npm run start:dev
 ```
 
 ### Production
