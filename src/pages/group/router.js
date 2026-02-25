@@ -1,3 +1,5 @@
+import Joi from '@hapi/joi'
+
 import * as manageController from './controller.js'
 
 const routes = [
@@ -9,6 +11,16 @@ const routes = [
   {
     method: 'POST',
     path: '/group',
+    options: {
+      validate: {
+        payload: Joi.object({
+          name: Joi.string().required(),
+          owner: Joi.string().required(),
+          description: Joi.string().required()
+        }),
+        failAction: manageController.failCreateGroup
+      }
+    },
     handler: manageController.updateManagePage
   },
   {

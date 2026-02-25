@@ -12,6 +12,16 @@ import { config } from '../../config/config.js'
  *
  * @returns {import('@hapi/hapi').ResponseObject} The response object for the homepage
  */
+function failCreateGroup (request, h, err) {
+  const errors = Object.fromEntries(
+    err.details.map(({ path, message }) => [path[0], message])
+  )
+  return h.view('group/create_group_page.njk', {
+    errors,
+    values: request.payload
+  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
+}
+
 function getManagePage (_request, h) {
   return h.view('group/create_group_page.njk')
     .code(statusCodes.HTTP_STATUS_OK)
@@ -51,6 +61,7 @@ function getGroupCreatedPage (request, h) {
 }
 
 export {
+  failCreateGroup,
   getManagePage,
   updateManagePage,
   getGroupCreatedPage
