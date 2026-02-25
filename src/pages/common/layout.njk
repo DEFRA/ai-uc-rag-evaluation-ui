@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" class="govuk-template govuk-template--rebranded">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    {% block title %}
+      {% if pageTitle %}
+        {% set title = pageTitle ~ ' | ' ~ serviceName %}
+      {% else %}
+        {% set title = serviceName %}
+      {% endif %}
+      <title>{{ title }}</title>
+    {% endblock %}
+    <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
+  </head>
+  <body class="govuk-template__body govuk-template--rebranded">
+    <script>
+      document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');
+    </script>
+
+    <header class="govuk-header" data-module="govuk-header">
+      <div class="govuk-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+          <a href="/" class="govuk-header__link">
+            <span class="govuk-header__logo-container">Department<br>for Environment,<br>Food &amp; Rural Affairs</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation">
+      <div class="govuk-width-container">
+        <div class="govuk-service-navigation__container">
+          <span class="govuk-service-navigation__service-name">
+            <a href="/" class="govuk-service-navigation__link">{{ serviceName }}</a>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <main class="govuk-main-wrapper" id="main-content">
+      <div class="govuk-width-container">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <footer class="govuk-footer">
+      <div class="govuk-width-container">
+        <div class="govuk-footer__meta">
+          <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="{{ getAssetPath('javascripts/application.js') }}"></script>
+  </body>
+</html>
