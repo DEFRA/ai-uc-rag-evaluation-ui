@@ -31,7 +31,7 @@ describe('#startServer', () => {
 
     test('Should start up server as expected', async () => {
       server = await serverImport.createServer()
-      await serverImport.startServer(server)
+      await server.initialize()
 
       expect(createServerSpy).toHaveBeenCalled()
       expect(hapiServerSpy).toHaveBeenCalled()
