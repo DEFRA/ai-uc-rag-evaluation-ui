@@ -1,0 +1,32 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Knowledge groups | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Knowledge groups</h1>
+
+  {% if groups.length %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">Group ID</th>
+          <th class="govuk-table__header" scope="col">Title</th>
+          <th class="govuk-table__header" scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for group in groups %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ group.groupId }}</td>
+            <td class="govuk-table__cell">{{ group.title }}</td>
+            <td class="govuk-table__cell">{{ group.description }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No knowledge groups found.</p>
+  {% endif %}
+{% endblock %}
