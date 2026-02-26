@@ -224,7 +224,7 @@ const config = convict({
   backend_rag_service: {
     doc: 'The base url for the backend rag service',
     format: String,
-    default: 'http://localhost:8085',
+    default: null,
     env: 'BACKEND_RAG_SERVICE_HOST'
   }
 })

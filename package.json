@@ -12,7 +12,7 @@
     "build": "NODE_ENV=production webpack",
     "build:watch": "NODE_ENV=development webpack --watch",
     "start": "NODE_ENV=production node --use-strict ./src/index.js",
-    "start:dev": "NODE_ENV=development run-p build:watch server:watch",
+    "start:dev": "NODE_ENV=development BACKEND_RAG_SERVICE_HOST=http://localhost:8085 run-p build:watch server:watch",
     "server:watch": "nodemon --watch src --ext js,njk --ignore src/client --exec 'node --use-strict ./src/index.js'",
     "lint": "run-s lint:js lint:scss",
     "lint:js": "eslint .",
