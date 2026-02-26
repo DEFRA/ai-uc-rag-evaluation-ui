@@ -14,6 +14,7 @@
           <th class="govuk-table__header" scope="col">Group ID</th>
           <th class="govuk-table__header" scope="col">Title</th>
           <th class="govuk-table__header" scope="col">Description</th>
+          <th class="govuk-table__header" scope="col">Actions</th>
         </tr>
       </thead>
       <tbody class="govuk-table__body">
@@ -22,6 +23,9 @@
             <td class="govuk-table__cell">{{ group.groupId }}</td>
             <td class="govuk-table__cell">{{ group.title }}</td>
             <td class="govuk-table__cell">{{ group.description }}</td>
+            <td class="govuk-table__cell">
+              <a href="/groups/{{ group.groupId }}/source/add" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">Add source</a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
