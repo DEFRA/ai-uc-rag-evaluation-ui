@@ -15,7 +15,7 @@ async function createGroup (name, owner, description) {
     console.error(`Backend request failed with status ${response.status}: ${errorMessage}`)
     throw Boom.badImplementation()
   }
-  return await response.json()
+  return response.json()
 }
 
 export {
