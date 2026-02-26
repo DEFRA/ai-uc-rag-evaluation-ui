@@ -220,6 +220,12 @@ const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  backend_rag_service: {
+    doc: 'The base url for the backend rag service',
+    format: String,
+    default: null,
+    env: 'BACKEND_RAG_SERVICE_HOST'
   }
 })
 

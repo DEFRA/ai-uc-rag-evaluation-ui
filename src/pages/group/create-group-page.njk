@@ -1,0 +1,52 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Create knowledge group | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Create knowledge group</h1>
+
+  {% if errors %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            {% if errors.name %}<li><a href="#name">{{ errors.name }}</a></li>{% endif %}
+            {% if errors.owner %}<li><a href="#owner">{{ errors.owner }}</a></li>{% endif %}
+            {% if errors.description %}<li><a href="#description">{{ errors.description }}</a></li>{% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="/group">
+    <div class="govuk-form-group{% if errors.name %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="name">Name</label>
+      {% if errors.name %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.name }}</p>
+      {% endif %}
+      <input class="govuk-input{% if errors.name %} govuk-input--error{% endif %}" id="name" name="name" type="text" value="{{ values.name }}">
+    </div>
+
+    <div class="govuk-form-group{% if errors.owner %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="owner">Owner</label>
+      {% if errors.owner %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.owner }}</p>
+      {% endif %}
+      <input class="govuk-input{% if errors.owner %} govuk-input--error{% endif %}" id="owner" name="owner" type="text" value="{{ values.owner }}">
+    </div>
+
+    <div class="govuk-form-group{% if errors.description %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="description">Description</label>
+      {% if errors.description %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.description }}</p>
+      {% endif %}
+      <textarea class="govuk-textarea{% if errors.description %} govuk-textarea--error{% endif %}" id="description" name="description" rows="5">{{ values.description }}</textarea>
+    </div>
+
+    <button type="submit" class="govuk-button">Submit</button>
+  </form>
+{% endblock %}
