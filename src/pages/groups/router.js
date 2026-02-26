@@ -10,6 +10,11 @@ const routes = [
   },
   {
     method: 'GET',
+    path: '/groups/{groupId}',
+    handler: groupsController.getGroupPage
+  },
+  {
+    method: 'GET',
     path: '/groups/{groupId}/source/add',
     handler: groupsController.getAddSourceForm
   },

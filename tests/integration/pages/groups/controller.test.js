@@ -110,7 +110,7 @@ describe('#groupsController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
-      expect(headers.location).toBe('/groups')
+      expect(headers.location).toBe('/groups/kg_test123')
     })
 
     test('Should return 400 and show errors when fields are empty', async () => {
