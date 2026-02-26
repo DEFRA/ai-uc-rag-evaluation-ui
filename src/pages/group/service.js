@@ -1,6 +1,6 @@
-import { config } from '../../config/config.js'
 import Boom from '@hapi/boom'
-import { fetch } from 'undici'
+
+import { config } from '../../config/config.js'
 
 async function createGroup (name, owner, description) {
   const backendRagServer = config.get('backend_rag_service')

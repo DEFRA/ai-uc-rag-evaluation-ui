@@ -1,25 +1,33 @@
 import { constants as statusCodes } from 'node:http2'
 
-import { vi } from 'vitest'
-import { fetch } from 'undici'
+import nock from 'nock'
 
 import { createServer } from '../../../../src/server/server.js'
 
-vi.mock('undici', async (importOriginal) => {
-  const actual = await importOriginal()
-  return { ...actual, fetch: vi.fn() }
-})
+const backendUrl = 'http://localhost:8085'
+
+const validPayload = {
+  name: 'Test Group',
+  owner: 'test-owner',
+  description: 'A test group',
+}
 
 describe('#groupController', () => {
   let server
 
   beforeAll(async () => {
+    nock.disableNetConnect()
     server = await createServer()
     await server.initialize()
   })
 
   afterAll(async () => {
+    nock.enableNetConnect()
     await server.stop({ timeout: 0 })
+  })
+
+  afterEach(() => {
+    nock.cleanAll()
   })
 
   describe('GET /group', () => {
@@ -36,24 +44,19 @@ describe('#groupController', () => {
 
   describe('POST /group', () => {
     test('Should redirect to group page on successful creation', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
+      nock(backendUrl)
+        .post('/knowledge/groups')
+        .reply(200, {
           groupId: 'kg_test123',
           title: 'Test Group',
           description: 'A test group',
           owner: 'test-owner'
         })
-      })
 
       const { statusCode, headers } = await server.inject({
         method: 'POST',
         url: '/group',
-        payload: {
-          name: 'Test Group',
-          owner: 'test-owner',
-          description: 'A test group'
-        }
+        payload: validPayload
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
@@ -61,20 +64,14 @@ describe('#groupController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve('Internal Server Error')
-      })
+      nock(backendUrl)
+        .post('/knowledge/groups')
+        .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: '/group',
-        payload: {
-          name: 'Test Group',
-          owner: 'test-owner',
-          description: 'A test group'
-        }
+        payload: validPayload
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
