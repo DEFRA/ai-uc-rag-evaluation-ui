@@ -5,6 +5,11 @@ import * as groupsController from './controller.js'
 const routes = [
   {
     method: 'GET',
+    path: '/',
+    handler: groupsController.getGroupsPage
+  },
+  {
+    method: 'GET',
     path: '/groups',
     handler: groupsController.getGroupsPage
   },
