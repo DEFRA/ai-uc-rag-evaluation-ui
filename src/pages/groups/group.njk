@@ -1,0 +1,64 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>{{ group.title }} | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">{{ group.title }}</h1>
+
+  <dl class="govuk-summary-list govuk-!-margin-bottom-8">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Group ID</dt>
+      <dd class="govuk-summary-list__value">{{ group.groupId }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Title</dt>
+      <dd class="govuk-summary-list__value">{{ group.title }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Description</dt>
+      <dd class="govuk-summary-list__value">{{ group.description }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Owner</dt>
+      <dd class="govuk-summary-list__value">{{ group.owner }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Created</dt>
+      <dd class="govuk-summary-list__value">{{ group.createdAt }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Updated</dt>
+      <dd class="govuk-summary-list__value">{{ group.updatedAt }}</dd>
+    </div>
+  </dl>
+
+  <h2 class="govuk-heading-l">Sources</h2>
+
+  {% set sourceList = group.sources | dictsort %}
+  {% if sourceList.length %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">Source ID</th>
+          <th class="govuk-table__header" scope="col">Name</th>
+          <th class="govuk-table__header" scope="col">Type</th>
+          <th class="govuk-table__header" scope="col">Location</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for key, source in group.sources %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ source.sourceId }}</td>
+            <td class="govuk-table__cell">{{ source.name }}</td>
+            <td class="govuk-table__cell">{{ source.type }}</td>
+            <td class="govuk-table__cell">{{ source.location }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No sources found.</p>
+  {% endif %}
+{% endblock %}
