@@ -13,16 +13,11 @@ async function updateGroup (request, h) {
   const { name, owner, description } = request.payload
 
   // We need to pass at least one source to the create endpoint due to schema validation (min_items=1)
-  const sources = [{
-    name: 'AI Opportunities Action Plan',
-    type: 'PRECHUNKED_BLOB',
-    location: 's3://placeholder',
-  }]
   const backendRagServer = config.get('backend_rag_service')
   const response = await fetch(backendRagServer + '/knowledge/groups', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, owner, description, sources })
+    body: JSON.stringify({ name, owner, description, sources: [] })
   })
 
   if (!response.ok) {
