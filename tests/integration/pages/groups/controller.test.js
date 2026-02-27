@@ -24,7 +24,7 @@ describe('#groupsController', () => {
     nock.cleanAll()
   })
 
-  describe('GET /groups', () => {
+  describe('GET /group', () => {
     test('Should render the groups list page with groups', async () => {
       nock(backendUrl)
         .get('/knowledge/groups')
@@ -39,7 +39,7 @@ describe('#groupsController', () => {
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/groups'
+        url: '/group'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
@@ -56,7 +56,7 @@ describe('#groupsController', () => {
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/groups'
+        url: '/group'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
@@ -70,7 +70,7 @@ describe('#groupsController', () => {
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/groups'
+        url: '/group'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
@@ -78,7 +78,7 @@ describe('#groupsController', () => {
     })
   })
 
-  describe('GET /groups/{groupId}', () => {
+  describe('GET /group/{groupId}', () => {
     test('Should render the group detail page', async () => {
       nock(backendUrl)
         .get('/knowledge/groups/kg_test123')
@@ -94,7 +94,7 @@ describe('#groupsController', () => {
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/groups/kg_test123'
+        url: '/group/kg_test123'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
@@ -110,7 +110,7 @@ describe('#groupsController', () => {
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/groups/kg_test123'
+        url: '/group/kg_test123'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
@@ -118,11 +118,11 @@ describe('#groupsController', () => {
     })
   })
 
-  describe('GET /groups/{groupId}/source/add', () => {
+  describe('GET /group/{groupId}/add_source', () => {
     test('Should render the add source form', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/groups/kg_test123/source/add'
+        url: '/group/kg_test123/add_source'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
@@ -130,7 +130,7 @@ describe('#groupsController', () => {
     })
   })
 
-  describe('POST /groups/{groupId}/source', () => {
+  describe('POST /group/{groupId}', () => {
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)
         .patch('/knowledge/groups/kg_test123/sources')
@@ -138,7 +138,7 @@ describe('#groupsController', () => {
 
       const { statusCode, headers } = await server.inject({
         method: 'POST',
-        url: '/groups/kg_test123/source',
+        url: '/group/kg_test123',
         payload: {
           name: 'Test Source',
           type: 'PRECHUNKED_BLOB',
@@ -147,13 +147,13 @@ describe('#groupsController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
-      expect(headers.location).toBe('/groups/kg_test123')
+      expect(headers.location).toBe('/group/kg_test123')
     })
 
     test('Should return 400 and show errors when fields are empty', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
-        url: '/groups/kg_test123/source',
+        url: '/group/kg_test123',
         payload: {}
       })
 
@@ -168,7 +168,7 @@ describe('#groupsController', () => {
 
       const { result, statusCode } = await server.inject({
         method: 'POST',
-        url: '/groups/kg_test123/source',
+        url: '/group/kg_test123',
         payload: {
           name: 'Test Source',
           type: 'PRECHUNKED_BLOB',

@@ -71,7 +71,7 @@ async function addSource (request, h) {
     throw Boom.badImplementation()
   }
 
-  return h.redirect(`/groups/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 export {

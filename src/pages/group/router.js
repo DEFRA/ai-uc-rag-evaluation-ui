@@ -5,7 +5,7 @@ import * as manageController from './controller.js'
 const routes = [
   {
     method: 'GET',
-    path: '/group',
+    path: '/group/add_group',
     handler: manageController.getAddGroupForm
   },
   {
@@ -22,11 +22,6 @@ const routes = [
       }
     },
     handler: manageController.updateGroup
-  },
-  {
-    method: 'GET',
-    path: '/group/{groupId}',
-    handler: manageController.getGroupCreatedPage
   }
 ]
 

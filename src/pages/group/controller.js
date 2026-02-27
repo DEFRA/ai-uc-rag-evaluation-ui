@@ -26,15 +26,8 @@ function failCreateGroup (request, h, err) {
   }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
 }
 
-function getGroupCreatedPage (request, h) {
-  const { groupId } = request.params
-  return h.view('group/group-created-page.njk', { groupId })
-    .code(statusCodes.HTTP_STATUS_OK)
-}
-
 export {
   failCreateGroup,
   getAddGroupForm,
-  updateGroup,
-  getGroupCreatedPage
+  updateGroup
 }

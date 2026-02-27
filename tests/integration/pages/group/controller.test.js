@@ -30,11 +30,11 @@ describe('#groupController', () => {
     nock.cleanAll()
   })
 
-  describe('GET /group', () => {
+  describe('GET /group/add_group', () => {
     test('Should render the create group page', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/group'
+        url: '/group/add_group'
       })
 
       expect(result).toEqual(expect.stringContaining('Create knowledge group |'))
@@ -87,18 +87,6 @@ describe('#groupController', () => {
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
       expect(result).toEqual(expect.stringContaining('There is a problem'))
-    })
-  })
-
-  describe('GET /group/{groupId}', () => {
-    test('Should render the group created page', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: '/group/kg_test123'
-      })
-
-      expect(result).toEqual(expect.stringContaining('Group created |'))
-      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
     })
   })
 })

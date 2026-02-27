@@ -10,22 +10,22 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/groups',
+    path: '/group',
     handler: groupsController.getGroupsPage
   },
   {
     method: 'GET',
-    path: '/groups/{groupId}',
+    path: '/group/{groupId}',
     handler: groupsController.getGroupPage
   },
   {
     method: 'GET',
-    path: '/groups/{groupId}/source/add',
+    path: '/group/{groupId}/add_source',
     handler: groupsController.getAddSourceForm
   },
   {
     method: 'POST',
-    path: '/groups/{groupId}/source',
+    path: '/group/{groupId}',
     options: {
       validate: {
         payload: Joi.object({
