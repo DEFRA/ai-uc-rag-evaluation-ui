@@ -1,6 +1,6 @@
 import { constants as statusCodes } from 'node:http2'
 
-import nock from 'nock'
+import { MockAgent, setGlobalDispatcher, getGlobalDispatcher } from 'undici'
 
 import { createServer } from '../../../../src/server/server.js'
 
@@ -9,25 +9,30 @@ const backendUrl = 'http://localhost:8085'
 const validPayload = {
   name: 'Test Group',
   owner: 'test-owner',
-  description: 'A test group',
+  description: 'A test group'
 }
 
 describe('#groupController', () => {
   let server
+  let mockAgent
+  let mockPool
+  let originalDispatcher
 
   beforeAll(async () => {
-    nock.disableNetConnect()
+    originalDispatcher = getGlobalDispatcher()
+    mockAgent = new MockAgent()
+    mockAgent.disableNetConnect()
+    setGlobalDispatcher(mockAgent)
+    mockPool = mockAgent.get(backendUrl)
+
     server = await createServer()
     await server.initialize()
   })
 
   afterAll(async () => {
-    nock.enableNetConnect()
+    setGlobalDispatcher(originalDispatcher)
+    await mockAgent.close()
     await server.stop({ timeout: 0 })
-  })
-
-  afterEach(() => {
-    nock.cleanAll()
   })
 
   describe('GET /group/add_group', () => {
@@ -44,8 +49,8 @@ describe('#groupController', () => {
 
   describe('POST /group', () => {
     test('Should redirect to group page on successful creation', async () => {
-      nock(backendUrl)
-        .post('/knowledge/groups')
+      mockPool
+        .intercept({ path: '/knowledge/groups', method: 'POST' })
         .reply(200, {
           groupId: 'kg_test123',
           title: 'Test Group',
@@ -64,8 +69,8 @@ describe('#groupController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      nock(backendUrl)
-        .post('/knowledge/groups')
+      mockPool
+        .intercept({ path: '/knowledge/groups', method: 'POST' })
         .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({

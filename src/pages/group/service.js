@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 
 import { config } from '../../config/config.js'
+import { fetch } from 'undici'
 
 const backendRagServer = config.get('backend_rag_service')
 

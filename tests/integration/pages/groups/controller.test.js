@@ -1,6 +1,6 @@
 import { constants as statusCodes } from 'node:http2'
 
-import nock from 'nock'
+import { MockAgent, setGlobalDispatcher, getGlobalDispatcher } from 'undici'
 
 import { createServer } from '../../../../src/server/server.js'
 
@@ -8,26 +8,31 @@ const backendUrl = 'http://localhost:8085'
 
 describe('#groupsController', () => {
   let server
+  let mockAgent
+  let mockPool
+  let originalDispatcher
 
   beforeAll(async () => {
-    nock.disableNetConnect()
+    originalDispatcher = getGlobalDispatcher()
+    mockAgent = new MockAgent()
+    mockAgent.disableNetConnect()
+    setGlobalDispatcher(mockAgent)
+    mockPool = mockAgent.get(backendUrl)
+
     server = await createServer()
     await server.initialize()
   })
 
   afterAll(async () => {
-    nock.enableNetConnect()
+    setGlobalDispatcher(originalDispatcher)
+    await mockAgent.close()
     await server.stop({ timeout: 0 })
-  })
-
-  afterEach(() => {
-    nock.cleanAll()
   })
 
   describe('GET /group', () => {
     test('Should render the groups list page with groups', async () => {
-      nock(backendUrl)
-        .get('/knowledge/groups')
+      mockPool
+        .intercept({ path: '/knowledge/groups', method: 'GET' })
         .reply(200, [
           {
             groupId: 'kg_test123',
@@ -50,8 +55,8 @@ describe('#groupsController', () => {
     })
 
     test('Should render the groups list page with no groups message when empty', async () => {
-      nock(backendUrl)
-        .get('/knowledge/groups')
+      mockPool
+        .intercept({ path: '/knowledge/groups', method: 'GET' })
         .reply(200, [])
 
       const { result, statusCode } = await server.inject({
@@ -64,8 +69,8 @@ describe('#groupsController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      nock(backendUrl)
-        .get('/knowledge/groups')
+      mockPool
+        .intercept({ path: '/knowledge/groups', method: 'GET' })
         .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({
@@ -80,8 +85,8 @@ describe('#groupsController', () => {
 
   describe('GET /group/{groupId}', () => {
     test('Should render the group detail page', async () => {
-      nock(backendUrl)
-        .get('/knowledge/groups/kg_test123')
+      mockPool
+        .intercept({ path: '/knowledge/groups/kg_test123', method: 'GET' })
         .reply(200, {
           groupId: 'kg_test123',
           title: 'Test Group',
@@ -104,8 +109,8 @@ describe('#groupsController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      nock(backendUrl)
-        .get('/knowledge/groups/kg_test123')
+      mockPool
+        .intercept({ path: '/knowledge/groups/kg_test123', method: 'GET' })
         .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({
@@ -132,8 +137,8 @@ describe('#groupsController', () => {
 
   describe('POST /group/{groupId}', () => {
     test('Should redirect to group page on successful source addition', async () => {
-      nock(backendUrl)
-        .patch('/knowledge/groups/kg_test123/sources')
+      mockPool
+        .intercept({ path: '/knowledge/groups/kg_test123/sources', method: 'PATCH' })
         .reply(200, {})
 
       const { statusCode, headers } = await server.inject({
@@ -162,8 +167,8 @@ describe('#groupsController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      nock(backendUrl)
-        .patch('/knowledge/groups/kg_test123/sources')
+      mockPool
+        .intercept({ path: '/knowledge/groups/kg_test123/sources', method: 'PATCH' })
         .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({
