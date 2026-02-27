@@ -1,12 +1,47 @@
 import Joi from '@hapi/joi'
 
-import * as manageController from './controller.js'
+import * as groupController from './controller.js'
 
 const routes = [
   {
     method: 'GET',
+    path: '/',
+    handler: groupController.getGroupsPage
+  },
+  {
+    method: 'GET',
+    path: '/group',
+    handler: groupController.getGroupsPage
+  },
+  {
+    method: 'GET',
+    path: '/group/{groupId}',
+    handler: groupController.getGroupPage
+  },
+  {
+    method: 'GET',
+    path: '/group/{groupId}/add_source',
+    handler: groupController.getAddSourceForm
+  },
+  {
+    method: 'POST',
+    path: '/group/{groupId}',
+    options: {
+      validate: {
+        payload: Joi.object({
+          name: Joi.string().required(),
+          type: Joi.string().valid('BLOB', 'PRECHUNKED_BLOB').required(),
+          location: Joi.string().required()
+        }),
+        failAction: groupController.failAddSource
+      }
+    },
+    handler: groupController.addSource
+  },
+  {
+    method: 'GET',
     path: '/group/add_group',
-    handler: manageController.getAddGroupForm
+    handler: groupController.getAddGroupForm
   },
   {
     method: 'POST',
@@ -18,10 +53,10 @@ const routes = [
           owner: Joi.string().required(),
           description: Joi.string().required()
         }),
-        failAction: manageController.failCreateGroup
+        failAction: groupController.failCreateGroup
       }
     },
-    handler: manageController.updateGroup
+    handler: groupController.updateGroup
   }
 ]
 
