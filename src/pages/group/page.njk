@@ -20,11 +20,11 @@
       <tbody class="govuk-table__body">
         {% for group in groups %}
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell"><a href="/groups/{{ group.groupId }}" class="govuk-link">{{ group.groupId }}</a></td>
+            <td class="govuk-table__cell"><a href="/group/{{ group.groupId }}" class="govuk-link">{{ group.groupId }}</a></td>
             <td class="govuk-table__cell">{{ group.title }}</td>
             <td class="govuk-table__cell">{{ group.description }}</td>
             <td class="govuk-table__cell">
-              <a href="/groups/{{ group.groupId }}/source/add" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">Add source</a>
+              <a href="/group/{{ group.groupId }}/add_source" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">Add source</a>
             </td>
           </tr>
         {% endfor %}

@@ -22,7 +22,7 @@
     </div>
   {% endif %}
 
-  <form method="post" action="/groups/{{ groupId }}/source">
+  <form method="post" action="/group/{{ groupId }}">
     <div class="govuk-form-group{% if errors.name %} govuk-form-group--error{% endif %}">
       <label class="govuk-label" for="name">Name</label>
       {% if errors.name %}
