@@ -1,0 +1,63 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Add source | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Add source</h1>
+
+  {% if errors %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            {% if errors.name %}<li><a href="#name">{{ errors.name }}</a></li>{% endif %}
+            {% if errors.type %}<li><a href="#type">{{ errors.type }}</a></li>{% endif %}
+            {% if errors.location %}<li><a href="#location">{{ errors.location }}</a></li>{% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="/group/{{ groupId }}">
+    <div class="govuk-form-group{% if errors.name %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="name">Name</label>
+      {% if errors.name %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.name }}</p>
+      {% endif %}
+      <input class="govuk-input{% if errors.name %} govuk-input--error{% endif %}" id="name" name="name" type="text" value="{{ values.name }}">
+    </div>
+
+    <div class="govuk-form-group{% if errors.type %} govuk-form-group--error{% endif %}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend">Type</legend>
+        {% if errors.type %}
+          <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.type }}</p>
+        {% endif %}
+        <div class="govuk-radios" id="type">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="type-prechunked" name="type" type="radio" value="PRECHUNKED_BLOB" {{ 'checked' if values.type === 'PRECHUNKED_BLOB' or not values.type }}>
+            <label class="govuk-label govuk-radios__label" for="type-prechunked">PRECHUNKED_BLOB</label>
+          </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="type-blob" name="type" type="radio" value="BLOB" {{ 'checked' if values.type === 'BLOB' }}>
+            <label class="govuk-label govuk-radios__label" for="type-blob">BLOB</label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="govuk-form-group{% if errors.location %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="location">Location</label>
+      {% if errors.location %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.location }}</p>
+      {% endif %}
+      <input class="govuk-input{% if errors.location %} govuk-input--error{% endif %}" id="location" name="location" type="text" value="{{ values.location }}">
+    </div>
+
+    <button type="submit" class="govuk-button">Add source</button>
+  </form>
+{% endblock %}
