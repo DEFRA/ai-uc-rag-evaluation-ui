@@ -16,7 +16,7 @@ const routes = [
   {
     method: 'GET',
     path: '/group/{groupId}',
-    handler: groupController.getGroupPage
+    handler: groupController.getGroup
   },
   {
     method: 'GET',
@@ -56,7 +56,7 @@ const routes = [
         failAction: groupController.failCreateGroup
       }
     },
-    handler: groupController.updateGroup
+    handler: groupController.createGroup
   }
 ]
 

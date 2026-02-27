@@ -1,32 +1,7 @@
 import { statusCodes } from '../../constants/status-codes.js'
-import { createGroup } from './service.js'
+import { createGroup as serviceCreateGroup } from './service.js'
 import { config } from '../../config/config.js'
 import Boom from '@hapi/boom'
-
-function getAddGroupForm (_request, h) {
-  return h.view('group/create-group-page.njk')
-    .code(statusCodes.HTTP_STATUS_OK)
-}
-
-async function updateGroup (request, h) {
-  const { name, owner, description } = request.payload
-
-  const group = await createGroup(name, owner, description)
-
-  console.info(`Created group ${name} id ${group.groupId}`)
-
-  return h.redirect(`/group/${group.groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
-}
-
-function failCreateGroup (request, h, err) {
-  const errors = Object.fromEntries(
-    err.details.map(({ path, message }) => [path[0], message])
-  )
-  return h.view('group/create-group-page.njk', {
-    errors,
-    values: request.payload
-  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
-}
 
 async function getGroupsPage (_request, h) {
   const backendRagServer = config.get('backend_rag_service')
@@ -44,7 +19,32 @@ async function getGroupsPage (_request, h) {
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
-async function getGroupPage (request, h) {
+function getAddGroupForm (_request, h) {
+  return h.view('group/create-group-page.njk')
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+async function createGroup (request, h) {
+  const { name, owner, description } = request.payload
+
+  const group = await serviceCreateGroup(name, owner, description)
+
+  console.info(`Created group ${name} id ${group.groupId}`)
+
+  return h.redirect(`/group/${group.groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+}
+
+function failCreateGroup (request, h, err) {
+  const errors = Object.fromEntries(
+    err.details.map(({ path, message }) => [path[0], message])
+  )
+  return h.view('group/create-group-page.njk', {
+    errors,
+    values: request.payload
+  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
+}
+
+async function getGroup (request, h) {
   const { groupId } = request.params
   const backendRagServer = config.get('backend_rag_service')
   const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}`)
@@ -102,9 +102,9 @@ async function addSource (request, h) {
 export {
   failCreateGroup,
   getAddGroupForm,
-  updateGroup,
+  createGroup,
   getGroupsPage,
-  getGroupPage,
+  getGroup,
   getAddSourceForm,
   failAddSource,
   addSource
