@@ -1,32 +1,34 @@
 import { constants as statusCodes } from 'node:http2'
 
-import { vi } from 'vitest'
-import { fetch } from 'undici'
+import nock from 'nock'
 
 import { createServer } from '../../../../src/server/server.js'
 
-vi.mock('undici', async (importOriginal) => {
-  const actual = await importOriginal()
-  return { ...actual, fetch: vi.fn() }
-})
+const backendUrl = 'http://localhost:8085'
 
 describe('#groupsController', () => {
   let server
 
   beforeAll(async () => {
+    nock.disableNetConnect()
     server = await createServer()
     await server.initialize()
   })
 
   afterAll(async () => {
+    nock.enableNetConnect()
     await server.stop({ timeout: 0 })
+  })
+
+  afterEach(() => {
+    nock.cleanAll()
   })
 
   describe('GET /groups', () => {
     test('Should render the groups list page with groups', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve([
+      nock(backendUrl)
+        .get('/knowledge/groups')
+        .reply(200, [
           {
             groupId: 'kg_test123',
             title: 'Test Group',
@@ -34,7 +36,6 @@ describe('#groupsController', () => {
             owner: 'test-owner'
           }
         ])
-      })
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
@@ -49,10 +50,9 @@ describe('#groupsController', () => {
     })
 
     test('Should render the groups list page with no groups message when empty', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve([])
-      })
+      nock(backendUrl)
+        .get('/knowledge/groups')
+        .reply(200, [])
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
@@ -64,11 +64,9 @@ describe('#groupsController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve('Internal Server Error')
-      })
+      nock(backendUrl)
+        .get('/knowledge/groups')
+        .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
@@ -93,11 +91,10 @@ describe('#groupsController', () => {
   })
 
   describe('POST /groups/{groupId}/source', () => {
-    test('Should redirect to groups page on successful source addition', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({})
-      })
+    test('Should redirect to group page on successful source addition', async () => {
+      nock(backendUrl)
+        .patch('/knowledge/groups/kg_test123/sources')
+        .reply(200, {})
 
       const { statusCode, headers } = await server.inject({
         method: 'POST',
@@ -125,11 +122,9 @@ describe('#groupsController', () => {
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve('Internal Server Error')
-      })
+      nock(backendUrl)
+        .patch('/knowledge/groups/kg_test123/sources')
+        .reply(500, 'Internal Server Error')
 
       const { result, statusCode } = await server.inject({
         method: 'POST',

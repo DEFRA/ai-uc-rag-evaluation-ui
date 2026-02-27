@@ -1,5 +1,4 @@
 import Boom from '@hapi/boom'
-import { fetch } from 'undici'
 
 import { config } from '../../config/config.js'
 import { statusCodes } from '../../constants/status-codes.js'
