@@ -1,10 +1,8 @@
 import Boom from '@hapi/boom'
-import { fetch } from 'undici'
 
 import { config } from '../../config/config.js'
 
 const backendRagServer = config.get('backend_rag_service')
-const ingestionDataBucketName = config.get('ingestion_data_bucket_name')
 
 async function getGroups () {
   const response = await fetch(`${backendRagServer}/knowledge/groups`)
