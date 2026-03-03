@@ -136,6 +136,41 @@ describe('#groupController', () => {
     })
   })
 
+  describe('GET /group/{groupId}/upload_source', () => {
+    test('Should render the upload form with the upload URL', async () => {
+      nock(backendUrl)
+        .post('/upload-initiate')
+        .reply(200, {
+          uploadId: 'upload_test123',
+          uploadUrl: 'http://localhost:7337/upload-and-scan/test-uuid',
+          statusUrl: 'http://localhost:7337/status/test-uuid'
+        })
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123/upload_source'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('Upload source file |'))
+      expect(result).toEqual(expect.stringContaining('http://localhost:7337/upload-and-scan/test-uuid'))
+    })
+
+    test('Should return 500 when backend returns 500', async () => {
+      nock(backendUrl)
+        .post('/upload-initiate')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123/upload_source'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
   describe('POST /group', () => {
     test('Should redirect to group page on successful creation', async () => {
       nock(backendUrl)
@@ -185,6 +220,7 @@ describe('#groupController', () => {
   })
 
   describe('POST /group/{groupId}', () => {
+    // todo add a test here
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)
         .patch('/knowledge/groups/kg_test123/sources')
