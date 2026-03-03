@@ -1,5 +1,8 @@
 import { statusCodes } from '../../constants/status-codes.js'
 import * as service from './service.js'
+import { config } from '../../config/config.js'
+
+const ingestionDataBucketName = config.get('ingestion_data_bucket_name')
 
 async function getGroupsPage (_request, h) {
   const groups = await service.getGroups()
@@ -42,9 +45,26 @@ async function getGroup (request, h) {
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
-function getAddSourceForm (request, h) {
+async function getUploadSourceForm (request, h) {
   const { groupId } = request.params
-  return h.view('group/add_source.njk', { groupId })
+  const correlationId = crypto.randomUUID()
+  const initiateResponse = await service.initiateUpload(groupId, correlationId)
+
+  request.yar.set(correlationId, initiateResponse)
+
+  return h.view('group/source_upload_file.njk', { groupId, uploadUrl: initiateResponse.uploadUrl })
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+async function getAddSourceForm (request, h) {
+  const { groupId } = request.params
+  const { correlation_id: correlationId } = request.query
+  const initiateResponse = request.yar.get(correlationId)
+  const uploadResponse = await service.getUploadStatus(initiateResponse)
+
+  const location = `s3://${ingestionDataBucketName}/${initiateResponse.uploadId}/${uploadResponse.form.file.fileId}`
+
+  return h.view('group/source_add_details.njk', { groupId, values: { location } })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -53,10 +73,11 @@ function failAddSource (request, h, err) {
   const errors = Object.fromEntries(
     err.details.map(({ path, message }) => [path[0], message])
   )
-  return h.view('group/add_source.njk', {
+
+  return h.view('group/source_add_details.njk', {
     groupId,
     errors,
-    values: request.payload
+    values: request.payload,
   }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
 }
 
@@ -75,6 +96,7 @@ export {
   createGroup,
   getGroupsPage,
   getGroup,
+  getUploadSourceForm,
   getAddSourceForm,
   failAddSource,
   addSource

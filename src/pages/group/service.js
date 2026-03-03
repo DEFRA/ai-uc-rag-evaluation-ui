@@ -1,8 +1,10 @@
 import Boom from '@hapi/boom'
+import { fetch } from 'undici'
 
 import { config } from '../../config/config.js'
 
 const backendRagServer = config.get('backend_rag_service')
+const ingestionDataBucketName = config.get('ingestion_data_bucket_name')
 
 async function getGroups () {
   const response = await fetch(`${backendRagServer}/knowledge/groups`)
@@ -43,6 +45,46 @@ async function getGroup (groupId) {
   return response.json()
 }
 
+async function initiateUpload (groupId, correlationId) {
+  const initiateResponse = await fetch('http://localhost:7337/initiate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      redirect: `/group/${groupId}/add_source?correlation_id=${correlationId}`,
+      s3Bucket: ingestionDataBucketName,
+      metadata: {
+        reference: 'reference-identifier',
+        customerId: 'customer'
+      }
+    })
+  })
+
+  if (!initiateResponse.ok) {
+    const errorMessage = await initiateResponse.text()
+    console.error(`Initiate upload failed with ${initiateResponse.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+
+  return initiateResponse.json()
+}
+
+async function getUploadStatus (initiateResponse) {
+  console.info(`Getting status for ${initiateResponse.statusUrl}`)
+  const response = await fetch(initiateResponse.statusUrl)
+
+  console.log('Got response')
+  const responseJson = await response.json()
+  console.log(JSON.stringify(responseJson, null, 2))
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to get upload status with ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+
+  return responseJson
+}
+
 async function addSource (groupId, name, type, location) {
   const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/sources`, {
     method: 'PATCH',
@@ -60,6 +102,8 @@ async function addSource (groupId, name, type, location) {
 export {
   getGroups,
   createGroup,
+  getUploadStatus,
   getGroup,
+  initiateUpload,
   addSource
 }
