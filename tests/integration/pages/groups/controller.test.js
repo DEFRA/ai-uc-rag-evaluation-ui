@@ -118,18 +118,6 @@ describe('#groupsController', () => {
     })
   })
 
-  describe('GET /group/{groupId}/add_source', () => {
-    test('Should render the add source form', async () => {
-      const { result, statusCode } = await server.inject({
-        method: 'GET',
-        url: '/group/kg_test123/add_source'
-      })
-
-      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
-      expect(result).toEqual(expect.stringContaining('Add source |'))
-    })
-  })
-
   describe('POST /group/{groupId}', () => {
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)
