@@ -45,17 +45,13 @@ async function getGroup (groupId) {
   return response.json()
 }
 
-async function initiateUpload (groupId, correlationId) {
-  const initiateResponse = await fetch('http://localhost:7337/initiate', {
+async function initiateUpload (groupId, correlationId, serviceUrl) {
+  const initiateResponse = await fetch(`${backendRagServer}/upload-initiate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      redirect: `/group/${groupId}/add_source?correlation_id=${correlationId}`,
-      s3Bucket: ingestionDataBucketName,
-      metadata: {
-        reference: 'reference-identifier',
-        customerId: 'customer'
-      }
+      redirect: `${serviceUrl}/group/${groupId}/add_source?correlation_id=${correlationId}`,
+      groupId
     })
   })
 
