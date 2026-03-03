@@ -171,6 +171,59 @@ describe('#groupController', () => {
     })
   })
 
+  describe('GET /group/{groupId}/add_source', () => {
+    test('Should render the add source form with location pre-filled', async () => {
+      let capturedCorrelationId
+
+      nock(backendUrl)
+        .post('/upload-initiate')
+        .reply(function (_uri, requestBody) {
+          const body = typeof requestBody === 'string' ? JSON.parse(requestBody) : requestBody
+          capturedCorrelationId = new URL(body.redirect).searchParams.get('correlation_id')
+          return [200, {
+            uploadId: 'upload_test123',
+            uploadUrl: 'http://localhost:7337/upload-and-scan/test-uuid',
+            statusUrl: 'http://localhost:7337/status/test-uuid'
+          }]
+        })
+
+      const uploadPageResponse = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123/upload_source'
+      })
+
+      nock('http://localhost:7337')
+        .get('/status/test-uuid')
+        .reply(200, {
+          form: { file: { fileId: 'file_test123' } }
+        })
+
+      const cookies = [].concat(uploadPageResponse.headers['set-cookie'])
+        .map((c) => c.split(';')[0])
+        .join('; ')
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: `/group/kg_test123/add_source?correlation_id=${capturedCorrelationId}`,
+        headers: { cookie: cookies }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('Add source |'))
+      expect(result).toEqual(expect.stringContaining('upload_test123/file_test123'))
+    })
+
+    test('Should return 500 when correlation_id is not in session', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123/add_source?correlation_id=unknown-id'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
   describe('POST /group', () => {
     test('Should redirect to group page on successful creation', async () => {
       nock(backendUrl)
@@ -220,7 +273,7 @@ describe('#groupController', () => {
   })
 
   describe('POST /group/{groupId}', () => {
-    // todo add a test here
+
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)
         .patch('/knowledge/groups/kg_test123/sources')
