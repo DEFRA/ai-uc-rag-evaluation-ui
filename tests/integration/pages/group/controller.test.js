@@ -273,7 +273,6 @@ describe('#groupController', () => {
   })
 
   describe('POST /group/{groupId}', () => {
-
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)
         .patch('/knowledge/groups/kg_test123/sources')
