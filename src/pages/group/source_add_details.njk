@@ -49,15 +49,7 @@
         </div>
       </fieldset>
     </div>
-
-    <div class="govuk-form-group{% if errors.location %} govuk-form-group--error{% endif %}">
-      <label class="govuk-label" for="location">Location</label>
-      {% if errors.location %}
-        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.location }}</p>
-      {% endif %}
-      <input class="govuk-input{% if errors.location %} govuk-input--error{% endif %}" id="location" name="location" type="text" value="{{ values.location }}">
-    </div>
-
+    <input id="location" name="location" type="hidden" value="{{ values.location }}">
     <button type="submit" class="govuk-button">Add source</button>
   </form>
 {% endblock %}
