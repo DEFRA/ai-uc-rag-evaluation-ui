@@ -59,7 +59,7 @@
     "@vitest/coverage-v8": "4.0.18",
     "autoprefixer": "10.4.23",
     "clean-webpack-plugin": "4.0.0",
-    "copy-webpack-plugin": "13.0.1",
+    "copy-webpack-plugin": "14.0.0",
     "eslint": "9.39.3",
     "neostandard": "0.12.2",
     "nock": "14.0.11",
@@ -72,7 +72,7 @@
     "source-map-loader": "5.0.0",
     "stylelint": "16.26.1",
     "stylelint-config-gds": "2.0.0",
-    "terser-webpack-plugin": "5.3.16",
+    "terser-webpack-plugin": "5.3.17",
     "vitest": "4.0.18",
     "vitest-fetch-mock": "0.4.5",
     "webpack": "5.105.2",
@@ -80,6 +80,7 @@
     "webpack-cli": "6.0.1"
   },
   "overrides": {
-    "tmp": "0.2.5"
+    "tmp": "0.2.5",
+    "minimatch": "10.2.3"
   }
 }
