@@ -1,8 +1,5 @@
 import { statusCodes } from '../../constants/status-codes.js'
 import * as service from './service.js'
-import { config } from '../../config/config.js'
-
-const ingestionDataBucketName = config.get('ingestion_data_bucket_name')
 
 async function getGroupsPage (_request, h) {
   const groups = await service.getGroups()
@@ -62,7 +59,7 @@ async function getAddSourceForm (request, h) {
   const initiateResponse = request.yar.get(correlationId)
   const uploadResponse = await service.getUploadStatus(initiateResponse)
 
-  const location = `s3://${ingestionDataBucketName}/${initiateResponse.uploadId}/${uploadResponse.form.file.fileId}`
+  const location = `${initiateResponse.uploadId}/${uploadResponse.form.file.fileId}`
 
   return h.view('group/source_add_details.njk', { groupId, values: { location } })
     .code(statusCodes.HTTP_STATUS_OK)
@@ -90,6 +87,14 @@ async function addSource (request, h) {
   return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
+async function ingestGroup (request, h) {
+  const { groupId } = request.params
+
+  await service.ingestGroup(groupId)
+
+  return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
+}
+
 export {
   failCreateGroup,
   getAddGroupForm,
@@ -99,5 +104,6 @@ export {
   getUploadSourceForm,
   getAddSourceForm,
   failAddSource,
-  addSource
+  addSource,
+  ingestGroup
 }

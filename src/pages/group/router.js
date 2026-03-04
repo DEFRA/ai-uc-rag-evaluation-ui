@@ -31,6 +31,11 @@ const routes = [
   },
   {
     method: 'POST',
+    path: '/group/{groupId}/ingest',
+    handler: groupController.ingestGroup
+  },
+  {
+    method: 'POST',
     path: '/group/{groupId}',
     options: {
       validate: {
