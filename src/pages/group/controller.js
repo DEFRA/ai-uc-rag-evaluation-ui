@@ -48,8 +48,7 @@ async function getGroup (request, h) {
 async function getUploadSourceForm (request, h) {
   const { groupId } = request.params
   const correlationId = crypto.randomUUID()
-  const serviceUrl = `${request.server.info.protocol}://${request.headers.host}`
-  const initiateResponse = await service.initiateUpload(groupId, correlationId, serviceUrl)
+  const initiateResponse = await service.initiateUpload(groupId, correlationId)
 
   request.yar.set(correlationId, initiateResponse)
 
