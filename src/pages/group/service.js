@@ -45,6 +45,8 @@ async function getGroup (groupId) {
 }
 
 async function initiateUpload (groupId, correlationId) {
+  console.log(`Redirect url set to ${serviceUrl}/group/${groupId}/add_source?correlation_id=${correlationId}`)
+
   const initiateResponse = await fetch(`${backendRagServer}/upload-initiate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
