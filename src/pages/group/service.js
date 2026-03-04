@@ -44,8 +44,6 @@ async function getGroup (groupId) {
 }
 
 async function initiateUpload (groupId, correlationId) {
-  console.log(`Redirect url set to /group/${groupId}/add_source?correlation_id=${correlationId}`)
-
   const initiateResponse = await fetch(`${backendRagServer}/upload-initiate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -65,10 +63,7 @@ async function initiateUpload (groupId, correlationId) {
 }
 
 async function getUploadStatus (initiateResponse) {
-  console.info(`Getting status for ${initiateResponse.statusUrl}`)
   const response = await fetch(initiateResponse.statusUrl)
-
-  console.log('Got response')
   const responseJson = await response.json()
 
   if (!response.ok) {
@@ -78,6 +73,32 @@ async function getUploadStatus (initiateResponse) {
   }
 
   return responseJson
+}
+
+async function getSnapshots (groupId) {
+  const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/snapshots`)
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to fetch snapshots for group ${groupId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+
+  return response.json()
+}
+
+async function ingestGroup (groupId) {
+  const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/ingest`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: ''
+  })
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to ingest group ${groupId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
 }
 
 async function addSource (groupId, name, type, location) {
@@ -99,6 +120,8 @@ export {
   createGroup,
   getUploadStatus,
   getGroup,
+  getSnapshots,
   initiateUpload,
-  addSource
+  addSource,
+  ingestGroup
 }

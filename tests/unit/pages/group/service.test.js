@@ -5,7 +5,9 @@ import {
   createGroup,
   getGroup,
   getGroups,
+  getSnapshots,
   getUploadStatus,
+  ingestGroup,
   initiateUpload
 } from '../../../../src/pages/group/service.js'
 
@@ -84,6 +86,24 @@ describe('getGroup', () => {
   })
 })
 
+describe('getSnapshots', () => {
+  test('should return snapshots on success', async () => {
+    const snapshots = [{ snapshot_id: 'kg_1_v1', group_id: 'kg_1', version: 1, created_at: '2026-03-04T16:26:09.940000', ingestion_status: 'completed' }]
+    mockFetch.mockResolvedValue(mockResponse(200, snapshots))
+
+    const result = await getSnapshots('kg_1')
+
+    expect(result).toEqual(snapshots)
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/knowledge/groups/kg_1/snapshots'))
+  })
+
+  test('should throw on non-ok response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(getSnapshots('kg_1')).rejects.toThrow()
+  })
+})
+
 describe('initiateUpload', () => {
   test('should return initiate response on success', async () => {
     const initiateData = {
@@ -139,6 +159,25 @@ describe('getUploadStatus', () => {
     mockFetch.mockResolvedValue(mockResponse(503, 'unavailable'))
 
     await expect(getUploadStatus(initiateResponse)).rejects.toThrow()
+  })
+})
+
+describe('ingestGroup', () => {
+  test('should call backend with correct method and url', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, {}))
+
+    await ingestGroup('kg_1')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/knowledge/groups/kg_1/ingest'),
+      expect.objectContaining({ method: 'POST' })
+    )
+  })
+
+  test('should throw on non-ok response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(ingestGroup('kg_1')).rejects.toThrow()
   })
 })
 
