@@ -69,4 +69,29 @@
   {% else %}
     <p class="govuk-body">No sources found.</p>
   {% endif %}
+
+  <h2 class="govuk-heading-l">Snapshots</h2>
+
+  {% if snapshots.length %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">Snapshot ID</th>
+          <th class="govuk-table__header" scope="col">Version</th>
+          <th class="govuk-table__header" scope="col">Created</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for snapshot in snapshots %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ snapshot.snapshot_id }}</td>
+            <td class="govuk-table__cell">{{ snapshot.version }}</td>
+            <td class="govuk-table__cell">{{ snapshot.created_at }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No snapshots found.</p>
+  {% endif %}
 {% endblock %}

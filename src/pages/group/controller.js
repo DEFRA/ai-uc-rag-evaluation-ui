@@ -36,9 +36,12 @@ function failCreateGroup (request, h, err) {
 async function getGroup (request, h) {
   const { groupId } = request.params
 
-  const group = await service.getGroup(groupId)
+  const [group, snapshots] = await Promise.all([
+    service.getGroup(groupId),
+    service.getSnapshots(groupId)
+  ])
 
-  return h.view('group/group.njk', { group })
+  return h.view('group/group.njk', { group, snapshots })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
