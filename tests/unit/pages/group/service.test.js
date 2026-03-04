@@ -88,7 +88,7 @@ describe('getGroup', () => {
 
 describe('getSnapshots', () => {
   test('should return snapshots on success', async () => {
-    const snapshots = [{ snapshot_id: 'kg_1_v1', group_id: 'kg_1', version: 1, created_at: '2026-03-04T16:26:09.940000' }]
+    const snapshots = [{ snapshot_id: 'kg_1_v1', group_id: 'kg_1', version: 1, created_at: '2026-03-04T16:26:09.940000', ingestion_status: 'completed' }]
     mockFetch.mockResolvedValue(mockResponse(200, snapshots))
 
     const result = await getSnapshots('kg_1')
