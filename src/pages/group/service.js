@@ -80,6 +80,23 @@ async function getUploadStatus (initiateResponse) {
   return responseJson
 }
 
+async function ingestGroup (groupId) {
+  console.log(`ingesting ${backendRagServer}/knowledge/groups/${groupId}/ingest}`)
+  const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/ingest`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: ''
+  })
+
+  console.log(`Ingestion retured ${response.status}`)
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to ingest group ${groupId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+}
+
 async function addSource (groupId, name, type, location) {
   const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/sources`, {
     method: 'PATCH',
@@ -100,5 +117,6 @@ export {
   getUploadStatus,
   getGroup,
   initiateUpload,
-  addSource
+  addSource,
+  ingestGroup
 }

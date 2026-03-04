@@ -6,6 +6,7 @@ import {
   getGroup,
   getGroups,
   getUploadStatus,
+  ingestGroup,
   initiateUpload
 } from '../../../../src/pages/group/service.js'
 
@@ -139,6 +140,25 @@ describe('getUploadStatus', () => {
     mockFetch.mockResolvedValue(mockResponse(503, 'unavailable'))
 
     await expect(getUploadStatus(initiateResponse)).rejects.toThrow()
+  })
+})
+
+describe('ingestGroup', () => {
+  test('should call backend with correct method and url', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, {}))
+
+    await ingestGroup('kg_1')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/knowledge/groups/kg_1/ingest'),
+      expect.objectContaining({ method: 'POST' })
+    )
+  })
+
+  test('should throw on non-ok response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(ingestGroup('kg_1')).rejects.toThrow()
   })
 })
 
