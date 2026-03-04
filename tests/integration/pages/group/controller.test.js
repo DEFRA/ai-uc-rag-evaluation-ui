@@ -109,6 +109,16 @@ describe('#groupController', () => {
           updatedAt: '2024-01-02T00:00:00Z',
           sources: {}
         })
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123/snapshots')
+        .reply(200, [
+          {
+            snapshot_id: 'kg_test123_v1',
+            group_id: 'kg_test123',
+            version: 1,
+            created_at: '2024-01-02T00:00:00Z'
+          }
+        ])
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
@@ -119,12 +129,16 @@ describe('#groupController', () => {
       expect(result).toEqual(expect.stringContaining('Test Group'))
       expect(result).toEqual(expect.stringContaining('kg_test123'))
       expect(result).toEqual(expect.stringContaining('No sources found.'))
+      expect(result).toEqual(expect.stringContaining('kg_test123_v1'))
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
       nock(backendUrl)
         .get('/knowledge/groups/kg_test123')
         .reply(500, 'Internal Server Error')
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123/snapshots')
+        .reply(200, [])
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
