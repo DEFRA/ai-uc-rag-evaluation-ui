@@ -179,7 +179,7 @@ describe('#groupController', () => {
         .post('/upload-initiate')
         .reply(function (_uri, requestBody) {
           const body = typeof requestBody === 'string' ? JSON.parse(requestBody) : requestBody
-          capturedCorrelationId = new URL(body.redirect).searchParams.get('correlation_id')
+          capturedCorrelationId = new URL(body.redirect, 'http://localhost').searchParams.get('correlation_id')
           return [200, {
             uploadId: 'upload_test123',
             uploadUrl: 'http://localhost:7337/upload-and-scan/test-uuid',

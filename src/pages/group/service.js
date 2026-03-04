@@ -3,7 +3,6 @@ import Boom from '@hapi/boom'
 import { config } from '../../config/config.js'
 
 const backendRagServer = config.get('backend_rag_service')
-const serviceUrl = config.get('service_url')
 
 async function getGroups () {
   const response = await fetch(`${backendRagServer}/knowledge/groups`)
@@ -45,13 +44,13 @@ async function getGroup (groupId) {
 }
 
 async function initiateUpload (groupId, correlationId) {
-  console.log(`Redirect url set to ${serviceUrl}/group/${groupId}/add_source?correlation_id=${correlationId}`)
+  console.log(`Redirect url set to /group/${groupId}/add_source?correlation_id=${correlationId}`)
 
   const initiateResponse = await fetch(`${backendRagServer}/upload-initiate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      redirect: `${serviceUrl}/group/${groupId}/add_source?correlation_id=${correlationId}`,
+      redirect: `/group/${groupId}/add_source?correlation_id=${correlationId}`,
       groupId
     })
   })
@@ -71,7 +70,6 @@ async function getUploadStatus (initiateResponse) {
 
   console.log('Got response')
   const responseJson = await response.json()
-  console.log(JSON.stringify(responseJson, null, 2))
 
   if (!response.ok) {
     const errorMessage = await response.text()
