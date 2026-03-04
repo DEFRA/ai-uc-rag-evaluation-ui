@@ -80,6 +80,18 @@ async function getUploadStatus (initiateResponse) {
   return responseJson
 }
 
+async function getSnapshots (groupId) {
+  const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/snapshots`)
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to fetch snapshots for group ${groupId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+
+  return response.json()
+}
+
 async function ingestGroup (groupId) {
   console.log(`ingesting ${backendRagServer}/knowledge/groups/${groupId}/ingest}`)
   const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/ingest`, {
@@ -116,6 +128,7 @@ export {
   createGroup,
   getUploadStatus,
   getGroup,
+  getSnapshots,
   initiateUpload,
   addSource,
   ingestGroup

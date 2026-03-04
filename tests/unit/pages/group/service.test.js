@@ -5,6 +5,7 @@ import {
   createGroup,
   getGroup,
   getGroups,
+  getSnapshots,
   getUploadStatus,
   ingestGroup,
   initiateUpload
@@ -82,6 +83,24 @@ describe('getGroup', () => {
     mockFetch.mockResolvedValue(mockResponse(500, 'error'))
 
     await expect(getGroup('kg_1')).rejects.toThrow()
+  })
+})
+
+describe('getSnapshots', () => {
+  test('should return snapshots on success', async () => {
+    const snapshots = [{ snapshot_id: 'kg_1_v1', group_id: 'kg_1', version: 1, created_at: '2026-03-04T16:26:09.940000' }]
+    mockFetch.mockResolvedValue(mockResponse(200, snapshots))
+
+    const result = await getSnapshots('kg_1')
+
+    expect(result).toEqual(snapshots)
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/knowledge/groups/kg_1/snapshots'))
+  })
+
+  test('should throw on non-ok response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(getSnapshots('kg_1')).rejects.toThrow()
   })
 })
 
