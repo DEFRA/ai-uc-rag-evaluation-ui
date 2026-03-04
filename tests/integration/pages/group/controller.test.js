@@ -116,7 +116,8 @@ describe('#groupController', () => {
             snapshot_id: 'kg_test123_v1',
             group_id: 'kg_test123',
             version: 1,
-            created_at: '2024-01-02T00:00:00Z'
+            created_at: '2024-01-02T00:00:00Z',
+            ingestion_status: 'completed'
           }
         ])
 
@@ -130,6 +131,7 @@ describe('#groupController', () => {
       expect(result).toEqual(expect.stringContaining('kg_test123'))
       expect(result).toEqual(expect.stringContaining('No sources found.'))
       expect(result).toEqual(expect.stringContaining('kg_test123_v1'))
+      expect(result).toEqual(expect.stringContaining('Completed'))
     })
 
     test('Should return 500 error page when backend returns 500', async () => {

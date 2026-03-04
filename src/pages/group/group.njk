@@ -34,12 +34,6 @@
     </div>
   </dl>
 
-  <form method="post" action="/group/{{ group.groupId }}/ingest">
-    <button class="govuk-button" data-module="govuk-button">
-      Ingest
-    </button>
-  </form>
-
   <h2 class="govuk-heading-l">Sources</h2>
 
   {% set sourceList = group.sources | dictsort %}
@@ -70,23 +64,42 @@
     <p class="govuk-body">No sources found.</p>
   {% endif %}
 
+  <form method="post" action="/group/{{ group.groupId }}/ingest">
+    <button class="govuk-button" data-module="govuk-button">
+      Ingest
+    </button>
+  </form>
+
+
   <h2 class="govuk-heading-l">Snapshots</h2>
 
   {% if snapshots.length %}
     <table class="govuk-table">
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-          <th class="govuk-table__header" scope="col">Snapshot ID</th>
           <th class="govuk-table__header" scope="col">Version</th>
+          <th class="govuk-table__header" scope="col">Snapshot ID</th>
           <th class="govuk-table__header" scope="col">Created</th>
+          <th class="govuk-table__header" scope="col">Ingestion Status</th>
         </tr>
       </thead>
       <tbody class="govuk-table__body">
         {% for snapshot in snapshots %}
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell">{{ snapshot.snapshot_id }}</td>
             <td class="govuk-table__cell">{{ snapshot.version }}</td>
+            <td class="govuk-table__cell">{{ snapshot.snapshot_id }}</td>
             <td class="govuk-table__cell">{{ snapshot.created_at }}</td>
+            <td class="govuk-table__cell">
+              {% if snapshot.ingestion_status === 'completed' %}
+                <strong class="govuk-tag govuk-tag--green">&#10003; Completed</strong>
+              {% elif snapshot.ingestion_status === 'failed' %}
+                <strong class="govuk-tag govuk-tag--red">&#9888; Failed</strong>
+              {% elif snapshot.ingestion_status === 'in_progress' %}
+                <strong class="govuk-tag govuk-tag--orange">&#9203; In progress</strong>
+              {% else %}
+                {{ snapshot.ingestion_status }}
+              {% endif %}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
