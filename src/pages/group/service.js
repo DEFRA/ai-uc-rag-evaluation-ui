@@ -3,6 +3,7 @@ import Boom from '@hapi/boom'
 import { config } from '../../config/config.js'
 
 const backendRagServer = config.get('backend_rag_service')
+const serviceUrl = config.get('service_url')
 
 async function getGroups () {
   const response = await fetch(`${backendRagServer}/knowledge/groups`)
@@ -43,7 +44,7 @@ async function getGroup (groupId) {
   return response.json()
 }
 
-async function initiateUpload (groupId, correlationId, serviceUrl) {
+async function initiateUpload (groupId, correlationId) {
   const initiateResponse = await fetch(`${backendRagServer}/upload-initiate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

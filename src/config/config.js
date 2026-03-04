@@ -233,6 +233,12 @@ const config = convict({
     default: null,
     env: 'INGESTION_DATA_BUCKET_NAME'
   },
+  service_url: {
+    doc: 'The url the service is exposed on, used to redirect the file uploader back to the frontend after uploading a file',
+    format: String,
+    default: null,
+    env: 'SERVICE_URL'
+  },
 })
 
 config.validate({ allowed: 'strict' })

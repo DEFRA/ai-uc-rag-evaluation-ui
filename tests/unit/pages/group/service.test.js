@@ -93,7 +93,7 @@ describe('initiateUpload', () => {
     }
     mockFetch.mockResolvedValue(mockResponse(200, initiateData))
 
-    const result = await initiateUpload('kg_1', 'corr-123', 'http://localhost:3000')
+    const result = await initiateUpload('kg_1', 'corr-123')
 
     expect(result).toEqual(initiateData)
     expect(mockFetch).toHaveBeenCalledWith(
