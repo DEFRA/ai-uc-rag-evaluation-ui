@@ -44,8 +44,6 @@ async function getGroup (groupId) {
 }
 
 async function initiateUpload (groupId, correlationId) {
-  console.log(`Redirect url set to /group/${groupId}/add_source?correlation_id=${correlationId}`)
-
   const initiateResponse = await fetch(`${backendRagServer}/upload-initiate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -65,10 +63,7 @@ async function initiateUpload (groupId, correlationId) {
 }
 
 async function getUploadStatus (initiateResponse) {
-  console.info(`Getting status for ${initiateResponse.statusUrl}`)
   const response = await fetch(initiateResponse.statusUrl)
-
-  console.log('Got response')
   const responseJson = await response.json()
 
   if (!response.ok) {
@@ -93,14 +88,11 @@ async function getSnapshots (groupId) {
 }
 
 async function ingestGroup (groupId) {
-  console.log(`ingesting ${backendRagServer}/knowledge/groups/${groupId}/ingest}`)
   const response = await fetch(`${backendRagServer}/knowledge/groups/${groupId}/ingest`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: ''
   })
-
-  console.log(`Ingestion retured ${response.status}`)
 
   if (!response.ok) {
     const errorMessage = await response.text()
