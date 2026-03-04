@@ -112,7 +112,7 @@ describe('initiateUpload', () => {
 
     const body = JSON.parse(mockFetch.mock.calls[0][1].body)
     expect(body.groupId).toBe('kg_1')
-    expect(body.redirect).toBe('http://localhost:3000/group/kg_1/add_source?correlation_id=corr-123')
+    expect(body.redirect).toBe('/group/kg_1/add_source?correlation_id=corr-123')
   })
 
   test('should throw on non-ok response', async () => {
