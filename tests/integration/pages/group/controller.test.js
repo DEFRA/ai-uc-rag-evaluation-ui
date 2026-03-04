@@ -272,6 +272,36 @@ describe('#groupController', () => {
     })
   })
 
+  describe('POST /group/{groupId}/ingest', () => {
+    test('Should redirect to home page after ingestion', async () => {
+      nock(backendUrl)
+        .post('/knowledge/groups/kg_test123/ingest')
+        .reply(200, {})
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/ingest'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
+      expect(headers.location).toBe('/')
+    })
+
+    test('Should return 500 error page when backend returns 500', async () => {
+      nock(backendUrl)
+        .post('/knowledge/groups/kg_test123/ingest')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/ingest'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
   describe('POST /group/{groupId}', () => {
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)
