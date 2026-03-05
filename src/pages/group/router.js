@@ -51,9 +51,9 @@ const routes = [
       validate: {
         payload: Joi.object({
           query: Joi.string().required(),
-          maxResults: Joi.number().integer().min(1).default(5)
+          maxResults: Joi.number().integer().min(1).required()
         }),
-        failAction: 'ignore'
+        failAction: groupController.failQueryGroup
       }
     },
     handler: groupController.queryGroup

@@ -7,14 +7,34 @@
 {% block content %}
   <h1 class="govuk-heading-xl">Query group</h1>
 
-  <form method="post" action="/group/{{ groupId }}/query">
-    <div class="govuk-form-group">
-      <label class="govuk-label" for="query">Query</label>
-      <textarea class="govuk-textarea" id="query" name="query" rows="5">{{ query }}</textarea>
+  {% if errors %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            {% if errors.query %}<li><a href="#query">{{ errors.query }}</a></li>{% endif %}
+            {% if errors.maxResults %}<li><a href="#maxResults">{{ errors.maxResults }}</a></li>{% endif %}
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="govuk-form-group">
+  {% endif %}
+
+  <form method="post" action="/group/{{ groupId }}/query">
+    <div class="govuk-form-group{% if errors.query %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="query">Query</label>
+      {% if errors.query %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.query }}</p>
+      {% endif %}
+      <textarea class="govuk-textarea{% if errors.query %} govuk-textarea--error{% endif %}" id="query" name="query" rows="5">{{ query }}</textarea>
+    </div>
+    <div class="govuk-form-group{% if errors.maxResults %} govuk-form-group--error{% endif %}">
       <label class="govuk-label" for="maxResults">Max results</label>
-      <input class="govuk-input govuk-input--width-5" id="maxResults" name="maxResults" type="number" min="1" value="{{ maxResults if maxResults else 5 }}">
+      {% if errors.maxResults %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.maxResults }}</p>
+      {% endif %}
+      <input class="govuk-input govuk-input--width-5{% if errors.maxResults %} govuk-input--error{% endif %}" id="maxResults" name="maxResults" type="number" min="1" value="{{ maxResults if maxResults else 5 }}">
     </div>
     <button type="submit" class="govuk-button">Search</button>
   </form>

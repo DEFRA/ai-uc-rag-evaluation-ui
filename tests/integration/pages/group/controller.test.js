@@ -375,11 +375,44 @@ describe('#groupController', () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: '/group/kg_test123/query',
-        payload: { query: 'what is the policy?' }
+        payload: { query: 'what is the policy?', maxResults: 5 }
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
       expect(result).toEqual(expect.stringContaining('No results found.'))
+    })
+
+    test('Should return 400 and show errors when query is empty', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: '', maxResults: 5 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+    })
+
+    test('Should return 400 and show errors when maxResults is missing', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?' }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+    })
+
+    test('Should return 400 and show errors when maxResults is less than 1', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?', maxResults: 0 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
@@ -390,7 +423,7 @@ describe('#groupController', () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: '/group/kg_test123/query',
-        payload: { query: 'what is the policy?' }
+        payload: { query: 'what is the policy?', maxResults: 5 }
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)

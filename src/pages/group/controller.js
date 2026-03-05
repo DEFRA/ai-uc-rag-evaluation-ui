@@ -98,6 +98,20 @@ async function ingestGroup (request, h) {
   return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
+function failQueryGroup (request, h, err) {
+  const { groupId } = request.params
+  const errors = Object.fromEntries(
+    err.details.map(({ path, message }) => [path[0], message])
+  )
+
+  return h.view('group/query.njk', {
+    groupId,
+    query: request.payload?.query,
+    maxResults: request.payload?.maxResults,
+    errors
+  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
+}
+
 function getQueryPage (request, h) {
   const { groupId } = request.params
 
@@ -136,5 +150,6 @@ export {
   ingestGroup,
   activateSnapshot,
   getQueryPage,
-  queryGroup
+  queryGroup,
+  failQueryGroup
 }
