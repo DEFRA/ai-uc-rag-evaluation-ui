@@ -34,7 +34,12 @@
     </div>
   </dl>
 
-  <h2 class="govuk-heading-l">Sources</h2>
+  <h2 class="govuk-heading-l" id="sources">Sources</h2>
+  <form method="get" action="/group/{{ group.groupId }}/upload_source">
+    <button class="govuk-button" data-module="govuk-button">
+      Add source
+    </button>
+  </form>
 
   {% set sourceList = group.sources | dictsort %}
   {% if sourceList.length %}
@@ -64,14 +69,13 @@
     <p class="govuk-body">No sources found.</p>
   {% endif %}
 
+  <h2 class="govuk-heading-l" id="snapshots">Snapshots</h2>
+
   <form method="post" action="/group/{{ group.groupId }}/ingest">
-    <button class="govuk-button" data-module="govuk-button">
-      Ingest
-    </button>
-  </form>
-
-
-  <h2 class="govuk-heading-l">Snapshots</h2>
+      <button class="govuk-button" data-module="govuk-button">
+        Ingest
+      </button>
+    </form>
 
   {% if snapshots.length %}
     <table class="govuk-table">
@@ -81,6 +85,8 @@
           <th class="govuk-table__header" scope="col">Snapshot ID</th>
           <th class="govuk-table__header" scope="col">Created</th>
           <th class="govuk-table__header" scope="col">Ingestion Status</th>
+          <th class="govuk-table__header" scope="col">Active</th>
+          <th class="govuk-table__header" scope="col">Actions</th>
         </tr>
       </thead>
       <tbody class="govuk-table__body">
@@ -91,19 +97,38 @@
             <td class="govuk-table__cell">{{ snapshot.created_at }}</td>
             <td class="govuk-table__cell">
               {% if snapshot.ingestion_status === 'completed' %}
-                <strong class="govuk-tag govuk-tag--green">&#10003; Completed</strong>
+                <strong class="govuk-tag govuk-tag--green">Completed</strong>
               {% elif snapshot.ingestion_status === 'failed' %}
-                <strong class="govuk-tag govuk-tag--red">&#9888; Failed</strong>
+                <strong class="govuk-tag govuk-tag--red">Failed</strong>
               {% elif snapshot.ingestion_status === 'in_progress' %}
-                <strong class="govuk-tag govuk-tag--orange">&#9203; In progress</strong>
+                <strong class="govuk-tag govuk-tag--orange">In progress</strong>
               {% else %}
                 {{ snapshot.ingestion_status }}
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              {% if group.activeSnapshot === snapshot.snapshot_id %}&#10003;{% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              {% if snapshot.ingestion_status === 'completed' %}
+                <form method="post" action="/group/{{ group.groupId }}/snapshots/{{ snapshot.snapshot_id }}/activate">
+                  <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">
+                    Activate
+                  </button>
+                </form>
               {% endif %}
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+    {% if group.activeSnapshot %}
+      <form method="get" action="/group/{{ group.groupId }}/query">
+        <button class="govuk-button" data-module="govuk-button">
+          Query
+        </button>
+      </form>
+    {% endif %}
   {% else %}
     <p class="govuk-body">No snapshots found.</p>
   {% endif %}

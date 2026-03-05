@@ -107,7 +107,8 @@ describe('#groupController', () => {
           owner: 'test-owner',
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-02T00:00:00Z',
-          sources: {}
+          sources: {},
+          activeSnapshot: null
         })
       nock(backendUrl)
         .get('/knowledge/groups/kg_test123/snapshots')
@@ -132,6 +133,47 @@ describe('#groupController', () => {
       expect(result).toEqual(expect.stringContaining('No sources found.'))
       expect(result).toEqual(expect.stringContaining('kg_test123_v1'))
       expect(result).toEqual(expect.stringContaining('Completed'))
+    })
+
+    test('Should show tick for the active snapshot', async () => {
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123')
+        .reply(200, {
+          groupId: 'kg_test123',
+          title: 'Test Group',
+          description: 'A test group',
+          owner: 'test-owner',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-02T00:00:00Z',
+          sources: {},
+          activeSnapshot: 'kg_test123_v1'
+        })
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123/snapshots')
+        .reply(200, [
+          {
+            snapshot_id: 'kg_test123_v1',
+            group_id: 'kg_test123',
+            version: 1,
+            created_at: '2024-01-02T00:00:00Z',
+            ingestion_status: 'completed'
+          },
+          {
+            snapshot_id: 'kg_test123_v2',
+            group_id: 'kg_test123',
+            version: 2,
+            created_at: '2024-01-03T00:00:00Z',
+            ingestion_status: 'completed'
+          }
+        ])
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('&#10003;'))
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
@@ -289,7 +331,7 @@ describe('#groupController', () => {
   })
 
   describe('POST /group/{groupId}/ingest', () => {
-    test('Should redirect to home page after ingestion', async () => {
+    test('Should redirect to group page after ingestion', async () => {
       nock(backendUrl)
         .post('/knowledge/groups/kg_test123/ingest')
         .reply(200, {})
@@ -300,7 +342,7 @@ describe('#groupController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
-      expect(headers.location).toBe('/')
+      expect(headers.location).toBe('/group/kg_test123')
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
@@ -311,6 +353,149 @@ describe('#groupController', () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: '/group/kg_test123/ingest'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
+  describe('GET /group/{groupId}/query', () => {
+    test('Should render the query page with default maxResults of 5', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123/query'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('Query group |'))
+      expect(result).toEqual(expect.stringContaining('<textarea'))
+      expect(result).toEqual(expect.stringContaining('value="5"'))
+    })
+  })
+
+  describe('POST /group/{groupId}/query', () => {
+    const queryResults = [
+      {
+        content: 'Some relevant content\nwith multiple lines',
+        similarityScore: 0.95,
+        similarityCategory: 'high',
+        createdAt: '2026-03-05T00:00:00Z',
+        name: 'Source A',
+        location: 's3://bucket/key',
+        snapshotId: 'snap_test123',
+        sourceId: 'src_test123'
+      }
+    ]
+
+    test('Should render results after a successful query', async () => {
+      nock(backendUrl)
+        .post('/snapshots/query')
+        .reply(200, queryResults)
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?', maxResults: 3 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('what is the policy?'))
+      expect(result).toEqual(expect.stringContaining('value="3"'))
+      expect(result).toEqual(expect.stringContaining('Some relevant content'))
+      expect(result).toEqual(expect.stringContaining('snap_test123'))
+      expect(result).toEqual(expect.stringContaining('src_test123'))
+      expect(result).toEqual(expect.stringContaining('0.95'))
+      expect(result).toEqual(expect.stringContaining('high'))
+    })
+
+    test('Should render no results message when backend returns empty array', async () => {
+      nock(backendUrl)
+        .post('/snapshots/query')
+        .reply(200, [])
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?', maxResults: 5 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('No results found.'))
+    })
+
+    test('Should return 400 and show errors when query is empty', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: '', maxResults: 5 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+    })
+
+    test('Should return 400 and show errors when maxResults is missing', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?' }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+    })
+
+    test('Should return 400 and show errors when maxResults is less than 1', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?', maxResults: 0 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
+      expect(result).toEqual(expect.stringContaining('There is a problem'))
+    })
+
+    test('Should return 500 error page when backend returns 500', async () => {
+      nock(backendUrl)
+        .post('/snapshots/query')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?', maxResults: 5 }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
+  describe('POST /group/{groupId}/snapshots/{snapshotId}/activate', () => {
+    test('Should redirect to home page after activation', async () => {
+      nock(backendUrl)
+        .patch('/snapshots/snap_test123/activate')
+        .reply(200, {})
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/snapshots/snap_test123/activate'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
+      expect(headers.location).toBe('/group/kg_test123')
+    })
+
+    test('Should return 500 error page when backend returns 500', async () => {
+      nock(backendUrl)
+        .patch('/snapshots/snap_test123/activate')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/snapshots/snap_test123/activate'
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)

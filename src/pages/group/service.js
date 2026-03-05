@@ -115,6 +115,35 @@ async function addSource (groupId, name, type, location) {
   }
 }
 
+async function querySnapshot (groupId, query, maxResults = 5) {
+  const response = await fetch(`${backendRagServer}/snapshots/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ groupId, query, maxResults })
+  })
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to query snapshots for group ${groupId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+
+  return response.json()
+}
+
+async function activateSnapshot (snapshotId) {
+  const response = await fetch(`${backendRagServer}/snapshots/${snapshotId}/activate`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' }
+  })
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to activate snapshot ${snapshotId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+}
+
 export {
   getGroups,
   createGroup,
@@ -123,5 +152,7 @@ export {
   getSnapshots,
   initiateUpload,
   addSource,
-  ingestGroup
+  ingestGroup,
+  activateSnapshot,
+  querySnapshot
 }

@@ -36,6 +36,30 @@ const routes = [
   },
   {
     method: 'POST',
+    path: '/group/{groupId}/snapshots/{snapshotId}/activate',
+    handler: groupController.activateSnapshot
+  },
+  {
+    method: 'GET',
+    path: '/group/{groupId}/query',
+    handler: groupController.getQueryPage
+  },
+  {
+    method: 'POST',
+    path: '/group/{groupId}/query',
+    options: {
+      validate: {
+        payload: Joi.object({
+          query: Joi.string().required(),
+          maxResults: Joi.number().integer().min(1).required()
+        }),
+        failAction: groupController.failQueryGroup
+      }
+    },
+    handler: groupController.queryGroup
+  },
+  {
+    method: 'POST',
     path: '/group/{groupId}',
     options: {
       validate: {
