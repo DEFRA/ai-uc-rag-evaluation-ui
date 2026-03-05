@@ -50,7 +50,8 @@ const routes = [
     options: {
       validate: {
         payload: Joi.object({
-          query: Joi.string().required()
+          query: Joi.string().required(),
+          maxResults: Joi.number().integer().min(1).default(5)
         }),
         failAction: 'ignore'
       }

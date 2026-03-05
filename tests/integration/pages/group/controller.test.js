@@ -319,7 +319,7 @@ describe('#groupController', () => {
   })
 
   describe('GET /group/{groupId}/query', () => {
-    test('Should render the query page', async () => {
+    test('Should render the query page with default maxResults of 5', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
         url: '/group/kg_test123/query'
@@ -328,6 +328,7 @@ describe('#groupController', () => {
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
       expect(result).toEqual(expect.stringContaining('Query group |'))
       expect(result).toEqual(expect.stringContaining('<textarea'))
+      expect(result).toEqual(expect.stringContaining('value="5"'))
     })
   })
 
@@ -353,11 +354,12 @@ describe('#groupController', () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
         url: '/group/kg_test123/query',
-        payload: { query: 'what is the policy?' }
+        payload: { query: 'what is the policy?', maxResults: 3 }
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
       expect(result).toEqual(expect.stringContaining('what is the policy?'))
+      expect(result).toEqual(expect.stringContaining('value="3"'))
       expect(result).toEqual(expect.stringContaining('Some relevant content'))
       expect(result).toEqual(expect.stringContaining('snap_test123'))
       expect(result).toEqual(expect.stringContaining('src_test123'))

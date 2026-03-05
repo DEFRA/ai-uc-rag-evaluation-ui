@@ -35,6 +35,11 @@
   </dl>
 
   <h2 class="govuk-heading-l">Sources</h2>
+  <form method="get" action="/group/{{ group.groupId }}/upload_source">
+    <button class="govuk-button" data-module="govuk-button">
+      Add source
+    </button>
+  </form>
 
   {% set sourceList = group.sources | dictsort %}
   {% if sourceList.length %}
@@ -64,14 +69,14 @@
     <p class="govuk-body">No sources found.</p>
   {% endif %}
 
-  <form method="post" action="/group/{{ group.groupId }}/ingest">
-    <button class="govuk-button" data-module="govuk-button">
-      Ingest
-    </button>
-  </form>
-
 
   <h2 class="govuk-heading-l">Snapshots</h2>
+
+  <form method="post" action="/group/{{ group.groupId }}/ingest">
+      <button class="govuk-button" data-module="govuk-button">
+        Ingest
+      </button>
+    </form>
 
   {% if snapshots.length %}
     <table class="govuk-table">
@@ -104,7 +109,7 @@
             <td class="govuk-table__cell">
               {% if snapshot.ingestion_status === 'completed' %}
                 <form method="post" action="/group/{{ group.groupId }}/snapshots/{{ snapshot.snapshot_id }}/activate">
-                  <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+                  <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">
                     Activate
                   </button>
                 </form>
@@ -114,7 +119,11 @@
         {% endfor %}
       </tbody>
     </table>
-    <a href="/group/{{ group.groupId }}/query" class="govuk-button govuk-button--secondary">Query</a>
+    <form method="get" action="/group/{{ group.groupId }}/query">
+      <button class="govuk-button" data-module="govuk-button">
+        Query
+      </button>
+    </form>
   {% else %}
     <p class="govuk-body">No snapshots found.</p>
   {% endif %}

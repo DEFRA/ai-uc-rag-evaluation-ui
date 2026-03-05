@@ -200,16 +200,25 @@ describe('querySnapshot', () => {
   test('should return results on success', async () => {
     mockFetch.mockResolvedValue(mockResponse(200, results))
 
-    const result = await querySnapshot('kg_1', 'what is the policy?')
+    const result = await querySnapshot('kg_1', 'what is the policy?', 10)
 
     expect(result).toEqual(results)
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/snapshots/query'),
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ groupId: 'kg_1', query: 'what is the policy?', maxResults: 5 })
+        body: JSON.stringify({ groupId: 'kg_1', query: 'what is the policy?', maxResults: 10 })
       })
     )
+  })
+
+  test('should default maxResults to 5', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, results))
+
+    await querySnapshot('kg_1', 'what is the policy?')
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body)
+    expect(body.maxResults).toBe(5)
   })
 
   test('should throw on non-ok response', async () => {

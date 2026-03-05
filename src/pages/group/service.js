@@ -115,11 +115,11 @@ async function addSource (groupId, name, type, location) {
   }
 }
 
-async function querySnapshot (groupId, query) {
+async function querySnapshot (groupId, query, maxResults = 5) {
   const response = await fetch(`${backendRagServer}/snapshots/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ groupId, query, maxResults: 5 })
+    body: JSON.stringify({ groupId, query, maxResults })
   })
 
   if (!response.ok) {

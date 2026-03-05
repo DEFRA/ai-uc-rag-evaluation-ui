@@ -107,11 +107,11 @@ function getQueryPage (request, h) {
 
 async function queryGroup (request, h) {
   const { groupId } = request.params
-  const { query } = request.payload
+  const { query, maxResults } = request.payload
 
-  const results = await service.querySnapshot(groupId, query)
+  const results = await service.querySnapshot(groupId, query, maxResults)
 
-  return h.view('group/query.njk', { groupId, query, results })
+  return h.view('group/query.njk', { groupId, query, maxResults, results })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 

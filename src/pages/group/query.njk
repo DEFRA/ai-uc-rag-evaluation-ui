@@ -12,6 +12,10 @@
       <label class="govuk-label" for="query">Query</label>
       <textarea class="govuk-textarea" id="query" name="query" rows="5">{{ query }}</textarea>
     </div>
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="maxResults">Max results</label>
+      <input class="govuk-input govuk-input--width-5" id="maxResults" name="maxResults" type="number" min="1" value="{{ maxResults if maxResults else 5 }}">
+    </div>
     <button type="submit" class="govuk-button">Search</button>
   </form>
 
