@@ -107,7 +107,8 @@ describe('#groupController', () => {
           owner: 'test-owner',
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-02T00:00:00Z',
-          sources: {}
+          sources: {},
+          activeSnapshot: null
         })
       nock(backendUrl)
         .get('/knowledge/groups/kg_test123/snapshots')
@@ -132,6 +133,47 @@ describe('#groupController', () => {
       expect(result).toEqual(expect.stringContaining('No sources found.'))
       expect(result).toEqual(expect.stringContaining('kg_test123_v1'))
       expect(result).toEqual(expect.stringContaining('Completed'))
+    })
+
+    test('Should show tick for the active snapshot', async () => {
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123')
+        .reply(200, {
+          groupId: 'kg_test123',
+          title: 'Test Group',
+          description: 'A test group',
+          owner: 'test-owner',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-02T00:00:00Z',
+          sources: {},
+          activeSnapshot: 'kg_test123_v1'
+        })
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123/snapshots')
+        .reply(200, [
+          {
+            snapshot_id: 'kg_test123_v1',
+            group_id: 'kg_test123',
+            version: 1,
+            created_at: '2024-01-02T00:00:00Z',
+            ingestion_status: 'completed'
+          },
+          {
+            snapshot_id: 'kg_test123_v2',
+            group_id: 'kg_test123',
+            version: 2,
+            created_at: '2024-01-03T00:00:00Z',
+            ingestion_status: 'completed'
+          }
+        ])
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('&#10003;'))
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
@@ -289,7 +331,7 @@ describe('#groupController', () => {
   })
 
   describe('POST /group/{groupId}/ingest', () => {
-    test('Should redirect to home page after ingestion', async () => {
+    test('Should redirect to group page after ingestion', async () => {
       nock(backendUrl)
         .post('/knowledge/groups/kg_test123/ingest')
         .reply(200, {})
@@ -300,7 +342,7 @@ describe('#groupController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
-      expect(headers.location).toBe('/')
+      expect(headers.location).toBe('/group/kg_test123')
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
@@ -443,7 +485,7 @@ describe('#groupController', () => {
       })
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
-      expect(headers.location).toBe('/')
+      expect(headers.location).toBe('/group/kg_test123')
     })
 
     test('Should return 500 error page when backend returns 500', async () => {

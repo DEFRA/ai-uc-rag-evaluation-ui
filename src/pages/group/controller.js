@@ -95,7 +95,7 @@ async function ingestGroup (request, h) {
 
   await service.ingestGroup(groupId)
 
-  return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 function failQueryGroup (request, h, err) {
@@ -130,11 +130,11 @@ async function queryGroup (request, h) {
 }
 
 async function activateSnapshot (request, h) {
-  const { snapshotId } = request.params
+  const { groupId, snapshotId } = request.params
 
   await service.activateSnapshot(snapshotId)
 
-  return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 export {
