@@ -1,1 +1,6 @@
 @use "govuk-frontend";
+
+.app-pre-wrap {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
