@@ -87,7 +87,7 @@ async function addSource (request, h) {
 
   await service.addSource(groupId, name, type, location)
 
-  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}#sources`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 async function ingestGroup (request, h) {
@@ -95,7 +95,7 @@ async function ingestGroup (request, h) {
 
   await service.ingestGroup(groupId)
 
-  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}#snapshots`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 function failQueryGroup (request, h, err) {
