@@ -123,11 +123,13 @@
         {% endfor %}
       </tbody>
     </table>
-    <form method="get" action="/group/{{ group.groupId }}/query">
-      <button class="govuk-button" data-module="govuk-button">
-        Query
-      </button>
-    </form>
+    {% if group.activeSnapshot %}
+      <form method="get" action="/group/{{ group.groupId }}/query">
+        <button class="govuk-button" data-module="govuk-button">
+          Query
+        </button>
+      </form>
+    {% endif %}
   {% else %}
     <p class="govuk-body">No snapshots found.</p>
   {% endif %}
