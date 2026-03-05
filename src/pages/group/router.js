@@ -36,6 +36,11 @@ const routes = [
   },
   {
     method: 'POST',
+    path: '/group/{groupId}/snapshots/{snapshotId}/activate',
+    handler: groupController.activateSnapshot
+  },
+  {
+    method: 'POST',
     path: '/group/{groupId}',
     options: {
       validate: {

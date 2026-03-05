@@ -115,6 +115,19 @@ async function addSource (groupId, name, type, location) {
   }
 }
 
+async function activateSnapshot (snapshotId) {
+  const response = await fetch(`${backendRagServer}/snapshots/${snapshotId}/activate`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' }
+  })
+
+  if (!response.ok) {
+    const errorMessage = await response.text()
+    console.error(`Failed to activate snapshot ${snapshotId} with status ${response.status}: ${errorMessage}`)
+    throw Boom.badImplementation()
+  }
+}
+
 export {
   getGroups,
   createGroup,
@@ -123,5 +136,6 @@ export {
   getSnapshots,
   initiateUpload,
   addSource,
-  ingestGroup
+  ingestGroup,
+  activateSnapshot
 }

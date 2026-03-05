@@ -318,6 +318,36 @@ describe('#groupController', () => {
     })
   })
 
+  describe('POST /group/{groupId}/snapshots/{snapshotId}/activate', () => {
+    test('Should redirect to home page after activation', async () => {
+      nock(backendUrl)
+        .patch('/snapshots/snap_test123/activate')
+        .reply(200, {})
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/snapshots/snap_test123/activate'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
+      expect(headers.location).toBe('/')
+    })
+
+    test('Should return 500 error page when backend returns 500', async () => {
+      nock(backendUrl)
+        .patch('/snapshots/snap_test123/activate')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/snapshots/snap_test123/activate'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
   describe('POST /group/{groupId}', () => {
     test('Should redirect to group page on successful source addition', async () => {
       nock(backendUrl)

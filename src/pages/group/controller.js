@@ -98,6 +98,14 @@ async function ingestGroup (request, h) {
   return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
+async function activateSnapshot (request, h) {
+  const { snapshotId } = request.params
+
+  await service.activateSnapshot(snapshotId)
+
+  return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
+}
+
 export {
   failCreateGroup,
   getAddGroupForm,
@@ -108,5 +116,6 @@ export {
   getAddSourceForm,
   failAddSource,
   addSource,
-  ingestGroup
+  ingestGroup,
+  activateSnapshot
 }

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
+  activateSnapshot,
   addSource,
   createGroup,
   getGroup,
@@ -178,6 +179,25 @@ describe('ingestGroup', () => {
     mockFetch.mockResolvedValue(mockResponse(500, 'error'))
 
     await expect(ingestGroup('kg_1')).rejects.toThrow()
+  })
+})
+
+describe('activateSnapshot', () => {
+  test('should call backend with PATCH and correct url', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, {}))
+
+    await activateSnapshot('snap_1')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/snapshots/snap_1/activate'),
+      expect.objectContaining({ method: 'PATCH' })
+    )
+  })
+
+  test('should throw on non-200 response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(activateSnapshot('snap_1')).rejects.toThrow()
   })
 })
 

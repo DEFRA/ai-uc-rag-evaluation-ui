@@ -81,6 +81,7 @@
           <th class="govuk-table__header" scope="col">Snapshot ID</th>
           <th class="govuk-table__header" scope="col">Created</th>
           <th class="govuk-table__header" scope="col">Ingestion Status</th>
+          <th class="govuk-table__header" scope="col">Actions</th>
         </tr>
       </thead>
       <tbody class="govuk-table__body">
@@ -98,6 +99,15 @@
                 <strong class="govuk-tag govuk-tag--orange">&#9203; In progress</strong>
               {% else %}
                 {{ snapshot.ingestion_status }}
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              {% if snapshot.ingestion_status === 'completed' %}
+                <form method="post" action="/group/{{ group.groupId }}/snapshots/{{ snapshot.snapshot_id }}/activate">
+                  <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+                    Activate
+                  </button>
+                </form>
               {% endif %}
             </td>
           </tr>
