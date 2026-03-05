@@ -1,0 +1,71 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Query group | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Query group</h1>
+
+  <form method="post" action="/group/{{ groupId }}/query">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="query">Query</label>
+      <textarea class="govuk-textarea" id="query" name="query" rows="5">{{ query }}</textarea>
+    </div>
+    <button type="submit" class="govuk-button">Search</button>
+  </form>
+
+  {% if results %}
+    <h2 class="govuk-heading-l">Results</h2>
+
+    {% if results.length %}
+      {% for result in results %}
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h3 class="govuk-summary-card__title">{{ result.name }}</h3>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Content</dt>
+                <dd class="govuk-summary-list__value">
+                  <p class="govuk-body app-pre-wrap">{{ result.content }}</p>
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Similarity score</dt>
+                <dd class="govuk-summary-list__value">{{ result.similarityScore }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Similarity category</dt>
+                <dd class="govuk-summary-list__value">{{ result.similarityCategory }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Source name</dt>
+                <dd class="govuk-summary-list__value">{{ result.name }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Location</dt>
+                <dd class="govuk-summary-list__value">{{ result.location }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Snapshot ID</dt>
+                <dd class="govuk-summary-list__value">{{ result.snapshotId }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Source ID</dt>
+                <dd class="govuk-summary-list__value">{{ result.sourceId }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Created</dt>
+                <dd class="govuk-summary-list__value">{{ result.createdAt }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="govuk-body">No results found.</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}

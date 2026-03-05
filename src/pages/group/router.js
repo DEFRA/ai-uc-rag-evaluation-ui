@@ -40,6 +40,24 @@ const routes = [
     handler: groupController.activateSnapshot
   },
   {
+    method: 'GET',
+    path: '/group/{groupId}/query',
+    handler: groupController.getQueryPage
+  },
+  {
+    method: 'POST',
+    path: '/group/{groupId}/query',
+    options: {
+      validate: {
+        payload: Joi.object({
+          query: Joi.string().required()
+        }),
+        failAction: 'ignore'
+      }
+    },
+    handler: groupController.queryGroup
+  },
+  {
     method: 'POST',
     path: '/group/{groupId}',
     options: {

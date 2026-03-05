@@ -98,6 +98,23 @@ async function ingestGroup (request, h) {
   return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
+function getQueryPage (request, h) {
+  const { groupId } = request.params
+
+  return h.view('group/query.njk', { groupId })
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+async function queryGroup (request, h) {
+  const { groupId } = request.params
+  const { query } = request.payload
+
+  const results = await service.querySnapshot(groupId, query)
+
+  return h.view('group/query.njk', { groupId, query, results })
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
 async function activateSnapshot (request, h) {
   const { snapshotId } = request.params
 
@@ -117,5 +134,7 @@ export {
   failAddSource,
   addSource,
   ingestGroup,
-  activateSnapshot
+  activateSnapshot,
+  getQueryPage,
+  queryGroup
 }

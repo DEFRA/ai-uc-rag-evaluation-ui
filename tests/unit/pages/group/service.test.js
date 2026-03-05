@@ -9,7 +9,8 @@ import {
   getSnapshots,
   getUploadStatus,
   ingestGroup,
-  initiateUpload
+  initiateUpload,
+  querySnapshot
 } from '../../../../src/pages/group/service.js'
 
 const mockFetch = vi.fn()
@@ -179,6 +180,42 @@ describe('ingestGroup', () => {
     mockFetch.mockResolvedValue(mockResponse(500, 'error'))
 
     await expect(ingestGroup('kg_1')).rejects.toThrow()
+  })
+})
+
+describe('querySnapshot', () => {
+  const results = [
+    {
+      content: 'Some content',
+      similarityScore: 0.95,
+      similarityCategory: 'high',
+      createdAt: '2026-03-05T00:00:00Z',
+      name: 'Source A',
+      location: 's3://bucket/key',
+      snapshotId: 'snap_1',
+      sourceId: 'src_1'
+    }
+  ]
+
+  test('should return results on success', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, results))
+
+    const result = await querySnapshot('kg_1', 'what is the policy?')
+
+    expect(result).toEqual(results)
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/snapshots/query'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ groupId: 'kg_1', query: 'what is the policy?', maxResults: 5 })
+      })
+    )
+  })
+
+  test('should throw on non-ok response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(querySnapshot('kg_1', 'what is the policy?')).rejects.toThrow()
   })
 })
 

@@ -318,6 +318,84 @@ describe('#groupController', () => {
     })
   })
 
+  describe('GET /group/{groupId}/query', () => {
+    test('Should render the query page', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/group/kg_test123/query'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('Query group |'))
+      expect(result).toEqual(expect.stringContaining('<textarea'))
+    })
+  })
+
+  describe('POST /group/{groupId}/query', () => {
+    const queryResults = [
+      {
+        content: 'Some relevant content\nwith multiple lines',
+        similarityScore: 0.95,
+        similarityCategory: 'high',
+        createdAt: '2026-03-05T00:00:00Z',
+        name: 'Source A',
+        location: 's3://bucket/key',
+        snapshotId: 'snap_test123',
+        sourceId: 'src_test123'
+      }
+    ]
+
+    test('Should render results after a successful query', async () => {
+      nock(backendUrl)
+        .post('/snapshots/query')
+        .reply(200, queryResults)
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?' }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('what is the policy?'))
+      expect(result).toEqual(expect.stringContaining('Some relevant content'))
+      expect(result).toEqual(expect.stringContaining('snap_test123'))
+      expect(result).toEqual(expect.stringContaining('src_test123'))
+      expect(result).toEqual(expect.stringContaining('0.95'))
+      expect(result).toEqual(expect.stringContaining('high'))
+    })
+
+    test('Should render no results message when backend returns empty array', async () => {
+      nock(backendUrl)
+        .post('/snapshots/query')
+        .reply(200, [])
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?' }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('No results found.'))
+    })
+
+    test('Should return 500 error page when backend returns 500', async () => {
+      nock(backendUrl)
+        .post('/snapshots/query')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/query',
+        payload: { query: 'what is the policy?' }
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
+    })
+  })
+
   describe('POST /group/{groupId}/snapshots/{snapshotId}/activate', () => {
     test('Should redirect to home page after activation', async () => {
       nock(backendUrl)
