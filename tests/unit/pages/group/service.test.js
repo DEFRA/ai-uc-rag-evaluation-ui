@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
+  activateSnapshot,
   addSource,
   createGroup,
   getGroup,
@@ -8,7 +9,8 @@ import {
   getSnapshots,
   getUploadStatus,
   ingestGroup,
-  initiateUpload
+  initiateUpload,
+  querySnapshot
 } from '../../../../src/pages/group/service.js'
 
 const mockFetch = vi.fn()
@@ -178,6 +180,70 @@ describe('ingestGroup', () => {
     mockFetch.mockResolvedValue(mockResponse(500, 'error'))
 
     await expect(ingestGroup('kg_1')).rejects.toThrow()
+  })
+})
+
+describe('querySnapshot', () => {
+  const results = [
+    {
+      content: 'Some content',
+      similarityScore: 0.95,
+      similarityCategory: 'high',
+      createdAt: '2026-03-05T00:00:00Z',
+      name: 'Source A',
+      location: 's3://bucket/key',
+      snapshotId: 'snap_1',
+      sourceId: 'src_1'
+    }
+  ]
+
+  test('should return results on success', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, results))
+
+    const result = await querySnapshot('kg_1', 'what is the policy?', 10)
+
+    expect(result).toEqual(results)
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/snapshots/query'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ groupId: 'kg_1', query: 'what is the policy?', maxResults: 10 })
+      })
+    )
+  })
+
+  test('should default maxResults to 5', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, results))
+
+    await querySnapshot('kg_1', 'what is the policy?')
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body)
+    expect(body.maxResults).toBe(5)
+  })
+
+  test('should throw on non-ok response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(querySnapshot('kg_1', 'what is the policy?')).rejects.toThrow()
+  })
+})
+
+describe('activateSnapshot', () => {
+  test('should call backend with PATCH and correct url', async () => {
+    mockFetch.mockResolvedValue(mockResponse(200, {}))
+
+    await activateSnapshot('snap_1')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/snapshots/snap_1/activate'),
+      expect.objectContaining({ method: 'PATCH' })
+    )
+  })
+
+  test('should throw on non-200 response', async () => {
+    mockFetch.mockResolvedValue(mockResponse(500, 'error'))
+
+    await expect(activateSnapshot('snap_1')).rejects.toThrow()
   })
 })
 
