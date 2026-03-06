@@ -97,11 +97,11 @@
             <td class="govuk-table__cell">{{ snapshot.created_at }}</td>
             <td class="govuk-table__cell">
               {% if snapshot.ingestion_status === 'completed' %}
-                <strong class="govuk-tag govuk-tag--green">&#10003; Completed</strong>
+                <strong class="govuk-tag govuk-tag--green">Completed</strong>
               {% elif snapshot.ingestion_status === 'failed' %}
-                <strong class="govuk-tag govuk-tag--red">&#9888; Failed</strong>
+                <strong class="govuk-tag govuk-tag--red">Failed</strong>
               {% elif snapshot.ingestion_status === 'in_progress' %}
-                <strong class="govuk-tag govuk-tag--orange">&#9203; In progress</strong>
+                <strong class="govuk-tag govuk-tag--orange">In progress</strong>
               {% else %}
                 {{ snapshot.ingestion_status }}
               {% endif %}
