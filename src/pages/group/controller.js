@@ -52,7 +52,7 @@ async function getUploadSourceForm (request, h) {
 
   request.yar.set(correlationId, initiateResponse)
 
-  return h.view('group/source_upload_file.njk', { groupId, uploadUrl: initiateResponse.uploadUrl })
+  return h.view('group/source-upload-file.njk', { groupId, uploadUrl: initiateResponse.uploadUrl })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -64,7 +64,7 @@ async function getAddSourceForm (request, h) {
 
   const location = `${initiateResponse.uploadId}/${uploadResponse.form.file.fileId}`
 
-  return h.view('group/source_add_details.njk', { groupId, values: { location } })
+  return h.view('group/source-add-details.njk', { groupId, values: { location } })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -74,7 +74,7 @@ function failAddSource (request, h, err) {
     err.details.map(({ path, message }) => [path[0], message])
   )
 
-  return h.view('group/source_add_details.njk', {
+  return h.view('group/source-add-details.njk', {
     groupId,
     errors,
     values: request.payload,
