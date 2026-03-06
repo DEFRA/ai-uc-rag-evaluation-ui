@@ -11,3 +11,4 @@ coverage
 tsconfig.tsbuildinfo
 .env
 CLAUDE.md
+.claude

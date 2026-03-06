@@ -45,6 +45,7 @@
           <th class="govuk-table__header" scope="col">Name</th>
           <th class="govuk-table__header" scope="col">Type</th>
           <th class="govuk-table__header" scope="col">Location</th>
+          <th class="govuk-table__header" scope="col">Status</th>
         </tr>
       </thead>
       <tbody class="govuk-table__body">
@@ -54,6 +55,7 @@
             <td class="govuk-table__cell">{{ source.name }}</td>
             <td class="govuk-table__cell">{{ source.type }}</td>
             <td class="govuk-table__cell">{{ source.location }}</td>
+            <td class="govuk-table__cell">{{ source.uploadStatus }}</td>
           </tr>
         {% endfor %}
       </tbody>
