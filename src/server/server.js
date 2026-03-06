@@ -80,12 +80,15 @@ async function createServer () {
     pulse,
     sessionCache,
     Scooter,
-    contentSecurityPolicy,
     HapiInert,
     serveStaticFiles,
     viewPlugin,
     router
   ])
+
+  if (config.get('env') !== 'development') {
+    await server.register(contentSecurityPolicy)
+  }
 
   server.ext('onPreResponse', catchAll)
 
