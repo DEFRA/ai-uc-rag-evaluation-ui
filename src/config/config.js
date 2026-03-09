@@ -226,7 +226,13 @@ const config = convict({
     format: String,
     default: null,
     env: 'BACKEND_RAG_SERVICE_HOST'
-  }
+  },
+  ingestion_data_bucket_name: {
+    doc: 'Bucket name for the sources to be uploaded to',
+    format: String,
+    default: null,
+    env: 'INGESTION_DATA_BUCKET_NAME'
+  },
 })
 
 config.validate({ allowed: 'strict' })

@@ -20,6 +20,12 @@ const routes = [
   },
   {
     method: 'GET',
+    path: '/group/{groupId}/upload_source',
+    handler: groupController.getUploadSourceForm
+  },
+
+  {
+    method: 'GET',
     path: '/group/{groupId}/add_source',
     handler: groupController.getAddSourceForm
   },
