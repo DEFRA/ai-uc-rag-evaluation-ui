@@ -1,6 +1,8 @@
 import { statusCodes } from '../../constants/status-codes.js'
 import * as service from './service.js'
 
+const groupTemplate = 'group/query.njk'
+
 async function getGroupsPage (_request, h) {
   const groups = await service.getGroups()
 
@@ -104,7 +106,7 @@ function failQueryGroup (request, h, err) {
     err.details.map(({ path, message }) => [path[0], message])
   )
 
-  return h.view('group/query.njk', {
+  return h.view(groupTemplate, {
     groupId,
     query: request.payload?.query,
     maxResults: request.payload?.maxResults,
@@ -115,7 +117,7 @@ function failQueryGroup (request, h, err) {
 function getQueryPage (request, h) {
   const { groupId } = request.params
 
-  return h.view('group/query.njk', { groupId })
+  return h.view(groupTemplate, { groupId })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -125,7 +127,7 @@ async function queryGroup (request, h) {
 
   const results = await service.querySnapshot(groupId, query, maxResults)
 
-  return h.view('group/query.njk', { groupId, query, maxResults, results })
+  return h.view(groupTemplate, { groupId, query, maxResults, results })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
