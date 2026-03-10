@@ -24,7 +24,16 @@
             <td class="govuk-table__cell">{{ group.title }}</td>
             <td class="govuk-table__cell">{{ group.description }}</td>
             <td class="govuk-table__cell">
-              <a href="/group/{{ group.groupId }}/upload_source" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">Add source</a>
+              <form method="get" action="/group/{{ group.groupId }}/upload_source" class="govuk-!-display-inline">
+                <button class="govuk-button govuk-!-margin-bottom-1" data-module="govuk-button">
+                  Add source
+                </button>
+              </form>
+              <form method="post" action="/group/{{ group.groupId }}/ingest" class="govuk-!-display-inline">
+                <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">
+                  Ingest
+                </button>
+              </form>
             </td>
           </tr>
         {% endfor %}

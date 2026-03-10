@@ -1,6 +1,8 @@
 import { statusCodes } from '../../constants/status-codes.js'
 import * as service from './service.js'
 
+const groupTemplate = 'group/query.njk'
+
 async function getGroupsPage (_request, h) {
   const groups = await service.getGroups()
 
@@ -52,7 +54,7 @@ async function getUploadSourceForm (request, h) {
 
   request.yar.set(correlationId, initiateResponse)
 
-  return h.view('group/source_upload_file.njk', { groupId, uploadUrl: initiateResponse.uploadUrl })
+  return h.view('group/source-upload-file.njk', { groupId, uploadUrl: initiateResponse.uploadUrl })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -64,7 +66,7 @@ async function getAddSourceForm (request, h) {
 
   const location = `${initiateResponse.uploadId}/${uploadResponse.form.file.fileId}`
 
-  return h.view('group/source_add_details.njk', { groupId, values: { location } })
+  return h.view('group/source-add-details.njk', { groupId, values: { location } })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -74,7 +76,7 @@ function failAddSource (request, h, err) {
     err.details.map(({ path, message }) => [path[0], message])
   )
 
-  return h.view('group/source_add_details.njk', {
+  return h.view('group/source-add-details.njk', {
     groupId,
     errors,
     values: request.payload,
@@ -87,7 +89,7 @@ async function addSource (request, h) {
 
   await service.addSource(groupId, name, type, location)
 
-  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}#sources`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 async function ingestGroup (request, h) {
@@ -95,7 +97,46 @@ async function ingestGroup (request, h) {
 
   await service.ingestGroup(groupId)
 
-  return h.redirect('/').code(statusCodes.HTTP_STATUS_SEE_OTHER)
+  return h.redirect(`/group/${groupId}#snapshots`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
+}
+
+function failQueryGroup (request, h, err) {
+  const { groupId } = request.params
+  const errors = Object.fromEntries(
+    err.details.map(({ path, message }) => [path[0], message])
+  )
+
+  return h.view(groupTemplate, {
+    groupId,
+    query: request.payload?.query,
+    maxResults: request.payload?.maxResults,
+    errors
+  }).code(statusCodes.HTTP_STATUS_BAD_REQUEST).takeover()
+}
+
+function getQueryPage (request, h) {
+  const { groupId } = request.params
+
+  return h.view(groupTemplate, { groupId })
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+async function queryGroup (request, h) {
+  const { groupId } = request.params
+  const { query, maxResults } = request.payload
+
+  const results = await service.querySnapshot(groupId, query, maxResults)
+
+  return h.view(groupTemplate, { groupId, query, maxResults, results })
+    .code(statusCodes.HTTP_STATUS_OK)
+}
+
+async function activateSnapshot (request, h) {
+  const { groupId, snapshotId } = request.params
+
+  await service.activateSnapshot(snapshotId)
+
+  return h.redirect(`/group/${groupId}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
 export {
@@ -108,5 +149,9 @@ export {
   getAddSourceForm,
   failAddSource,
   addSource,
-  ingestGroup
+  ingestGroup,
+  activateSnapshot,
+  getQueryPage,
+  queryGroup,
+  failQueryGroup
 }

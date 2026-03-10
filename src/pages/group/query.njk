@@ -1,0 +1,95 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Query group | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Query group</h1>
+
+  {% if errors %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            {% if errors.query %}<li><a href="#query">{{ errors.query }}</a></li>{% endif %}
+            {% if errors.maxResults %}<li><a href="#maxResults">{{ errors.maxResults }}</a></li>{% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="/group/{{ groupId }}/query">
+    <div class="govuk-form-group{% if errors.query %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="query">Query</label>
+      {% if errors.query %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.query }}</p>
+      {% endif %}
+      <textarea class="govuk-textarea{% if errors.query %} govuk-textarea--error{% endif %}" id="query" name="query" rows="5">{{ query }}</textarea>
+    </div>
+    <div class="govuk-form-group{% if errors.maxResults %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label" for="maxResults">Max results</label>
+      {% if errors.maxResults %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors.maxResults }}</p>
+      {% endif %}
+      <input class="govuk-input govuk-input--width-5{% if errors.maxResults %} govuk-input--error{% endif %}" id="maxResults" name="maxResults" type="number" min="1" value="{{ maxResults if maxResults else 5 }}">
+    </div>
+    <button type="submit" class="govuk-button">Search</button>
+  </form>
+
+  {% if results %}
+    <h2 class="govuk-heading-l">Results</h2>
+
+    {% if results.length %}
+      {% for result in results %}
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h3 class="govuk-summary-card__title">{{ result.name }}</h3>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Content</dt>
+                <dd class="govuk-summary-list__value">
+                  <p class="govuk-body app-pre-wrap">{{ result.content }}</p>
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Similarity score</dt>
+                <dd class="govuk-summary-list__value">{{ result.similarityScore }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Similarity category</dt>
+                <dd class="govuk-summary-list__value">{{ result.similarityCategory }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Source name</dt>
+                <dd class="govuk-summary-list__value">{{ result.name }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Location</dt>
+                <dd class="govuk-summary-list__value">{{ result.location }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Snapshot ID</dt>
+                <dd class="govuk-summary-list__value">{{ result.snapshotId }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Source ID</dt>
+                <dd class="govuk-summary-list__value">{{ result.sourceId }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Created</dt>
+                <dd class="govuk-summary-list__value">{{ result.createdAt }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="govuk-body">No results found.</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}
