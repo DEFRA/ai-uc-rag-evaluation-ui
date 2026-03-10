@@ -109,6 +109,17 @@ describe('#groupController', () => {
           updatedAt: '2024-01-02T00:00:00Z',
           sources: {}
         })
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123/snapshots')
+        .reply(200, [
+          {
+            snapshot_id: 'kg_test123_v1',
+            group_id: 'kg_test123',
+            version: 1,
+            created_at: '2024-01-02T00:00:00Z',
+            ingestion_status: 'completed'
+          }
+        ])
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
@@ -119,12 +130,17 @@ describe('#groupController', () => {
       expect(result).toEqual(expect.stringContaining('Test Group'))
       expect(result).toEqual(expect.stringContaining('kg_test123'))
       expect(result).toEqual(expect.stringContaining('No sources found.'))
+      expect(result).toEqual(expect.stringContaining('kg_test123_v1'))
+      expect(result).toEqual(expect.stringContaining('Completed'))
     })
 
     test('Should return 500 error page when backend returns 500', async () => {
       nock(backendUrl)
         .get('/knowledge/groups/kg_test123')
         .reply(500, 'Internal Server Error')
+      nock(backendUrl)
+        .get('/knowledge/groups/kg_test123/snapshots')
+        .reply(200, [])
 
       const { result, statusCode } = await server.inject({
         method: 'GET',
@@ -269,6 +285,36 @@ describe('#groupController', () => {
 
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_BAD_REQUEST)
       expect(result).toEqual(expect.stringContaining('There is a problem'))
+    })
+  })
+
+  describe('POST /group/{groupId}/ingest', () => {
+    test('Should redirect to home page after ingestion', async () => {
+      nock(backendUrl)
+        .post('/knowledge/groups/kg_test123/ingest')
+        .reply(200, {})
+
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/ingest'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_SEE_OTHER)
+      expect(headers.location).toBe('/')
+    })
+
+    test('Should return 500 error page when backend returns 500', async () => {
+      nock(backendUrl)
+        .post('/knowledge/groups/kg_test123/ingest')
+        .reply(500, 'Internal Server Error')
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/group/kg_test123/ingest'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+      expect(result).toEqual(expect.stringContaining('Something went wrong'))
     })
   })
 
