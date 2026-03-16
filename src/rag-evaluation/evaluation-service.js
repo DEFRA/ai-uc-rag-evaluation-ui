@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 
-import { config } from '../../config/config.js'
+import { config } from '../config/config.js'
 
 const evaluationService = config.get('evaluation_service')
 

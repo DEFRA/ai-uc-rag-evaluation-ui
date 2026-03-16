@@ -230,7 +230,7 @@ const config = convict({
   evaluation_service: {
     doc: 'The base url for the evaluation service',
     format: String,
-    default: 'http://localhost:9085',
+    default: null,
     env: 'EVALUATION_SERVICE_HOST'
   }
 })

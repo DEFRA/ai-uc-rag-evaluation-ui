@@ -1,5 +1,5 @@
-import { statusCodes } from '../../constants/status-codes.js'
-import * as service from './service.js'
+import { statusCodes } from '../../../constants/status-codes.js'
+import * as service from '../../../rag-evaluation/evaluation-service.js'
 
 const defaultBody = JSON.stringify({
   group_id: '',
@@ -11,15 +11,8 @@ const defaultBody = JSON.stringify({
   models: ['']
 }, null, 2)
 
-async function listEvaluationRuns (_request, h) {
-  const { runs } = await service.listEvaluationRuns()
-
-  return h.view('evaluation/list.njk', { runs })
-    .code(statusCodes.HTTP_STATUS_OK)
-}
-
 function getEvaluationForm (_request, h) {
-  return h.view('evaluation/run.njk', { defaultBody })
+  return h.view('evaluation/run/page.njk', { defaultBody })
     .code(statusCodes.HTTP_STATUS_OK)
 }
 
@@ -29,8 +22,9 @@ async function submitEvaluation (request, h) {
   let parsed
   try {
     parsed = JSON.parse(body)
-  } catch (_err) {
-    return h.view('evaluation/run.njk', {
+  } catch (err) {
+    console.error('Failed to parse evaluation request body:', err.message)
+    return h.view('evaluation/run/page.njk', {
       defaultBody: body,
       error: 'Invalid JSON — please check your request body.'
     }).code(statusCodes.HTTP_STATUS_BAD_REQUEST)
@@ -41,18 +35,7 @@ async function submitEvaluation (request, h) {
   return h.redirect(`/evaluation/${result.run_id}`).code(statusCodes.HTTP_STATUS_SEE_OTHER)
 }
 
-async function getEvaluationResult (request, h) {
-  const { runId } = request.params
-
-  const run = await service.getEvaluationRun(runId)
-
-  return h.view('evaluation/result.njk', { run })
-    .code(statusCodes.HTTP_STATUS_OK)
-}
-
 export {
-  listEvaluationRuns,
   getEvaluationForm,
-  submitEvaluation,
-  getEvaluationResult
+  submitEvaluation
 }

@@ -4,7 +4,7 @@ import {
   getEvaluationRun,
   listEvaluationRuns,
   startEvaluation
-} from '../../../../src/pages/evaluation/service.js'
+} from '../../../src/rag-evaluation/evaluation-service.js'
 
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)

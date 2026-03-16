@@ -1,25 +1,27 @@
-import * as evaluationController from './controller.js'
+import * as listController from './list/controller.js'
+import * as runController from './run/controller.js'
+import * as resultController from './result/controller.js'
 
 const routes = [
   {
     method: 'GET',
     path: '/evaluation',
-    handler: evaluationController.listEvaluationRuns
+    handler: listController.listEvaluationRuns
   },
   {
     method: 'GET',
-    path: '/evaluation/new',
-    handler: evaluationController.getEvaluationForm
+    path: '/evaluation/run',
+    handler: runController.getEvaluationForm
   },
   {
     method: 'POST',
-    path: '/evaluation/new',
-    handler: evaluationController.submitEvaluation
+    path: '/evaluation/run',
+    handler: runController.submitEvaluation
   },
   {
     method: 'GET',
     path: '/evaluation/{runId}',
-    handler: evaluationController.getEvaluationResult
+    handler: resultController.getEvaluationResult
   }
 ]
 
