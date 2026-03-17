@@ -46,6 +46,14 @@ describe('#resultController', () => {
               score: 0.75,
               reason: 'Mostly correct.'
             }
+          ],
+          evaluation_summary: [
+            {
+              model: 'haiku_3',
+              rubric: 'Score 0 to 1',
+              average_score: 0.75,
+              passed: true
+            }
           ]
         })
 
@@ -63,6 +71,8 @@ describe('#resultController', () => {
       expect(result).toEqual(expect.stringContaining('Artificial intelligence is a branch of computer science.'))
       expect(result).toEqual(expect.stringContaining('0.75'))
       expect(result).toEqual(expect.stringContaining('Mostly correct.'))
+      expect(result).toEqual(expect.stringContaining('Evaluation Summary'))
+      expect(result).toEqual(expect.stringContaining('Passed'))
     })
 
     test('Should show refresh button when run is not completed', async () => {
