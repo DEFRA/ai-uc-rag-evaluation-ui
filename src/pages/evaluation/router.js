@@ -22,6 +22,11 @@ const routes = [
     method: 'GET',
     path: '/evaluation/{runId}',
     handler: resultController.getEvaluationResult
+  },
+  {
+    method: 'GET',
+    path: '/evaluation/{runId}/download',
+    handler: resultController.downloadEvaluationResult
   }
 ]
 

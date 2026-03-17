@@ -40,6 +40,10 @@
     </div>
   </dl>
 
+  <p class="govuk-body">
+    <a class="govuk-link" href="/evaluation/{{ run.run_id }}/download">Download raw JSON</a>
+  </p>
+
   {% if run.status !== 'completed' %}
     <form method="get" action="/evaluation/{{ run.run_id }}">
       <button class="govuk-button govuk-button--secondary" data-module="govuk-button">

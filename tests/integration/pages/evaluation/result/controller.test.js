@@ -102,5 +102,67 @@ describe('#resultController', () => {
       expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
       expect(result).toEqual(expect.stringContaining('Something went wrong'))
     })
+
+    test('Should include download link on result page', async () => {
+      nock(evaluationUrl)
+        .get('/evaluation/run_abc123')
+        .reply(200, {
+          run_id: 'run_abc123',
+          status: 'completed',
+          group_id: 'kg_1',
+          snapshot_id: 'kg_1_v1',
+          models: ['haiku_3'],
+          results: []
+        })
+
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/evaluation/run_abc123'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(result).toEqual(expect.stringContaining('/evaluation/run_abc123/download'))
+      expect(result).toEqual(expect.stringContaining('Download raw JSON'))
+    })
+  })
+
+  describe('GET /evaluation/{runId}/download', () => {
+    test('Should return raw JSON with content-disposition header', async () => {
+      const runData = {
+        run_id: 'run_abc123',
+        status: 'completed',
+        group_id: 'kg_1',
+        snapshot_id: 'kg_1_v1',
+        models: ['haiku_3'],
+        results: []
+      }
+
+      nock(evaluationUrl)
+        .get('/evaluation/run_abc123')
+        .reply(200, runData)
+
+      const { result, statusCode, headers } = await server.inject({
+        method: 'GET',
+        url: '/evaluation/run_abc123/download'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_OK)
+      expect(headers['content-type']).toMatch(/application\/json/)
+      expect(headers['content-disposition']).toBe('attachment; filename="evaluation-run_abc123.json"')
+      expect(JSON.parse(result)).toEqual(runData)
+    })
+
+    test('Should return 500 when backend returns 500', async () => {
+      nock(evaluationUrl)
+        .get('/evaluation/run_abc123')
+        .reply(500, 'Internal Server Error')
+
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/evaluation/run_abc123/download'
+      })
+
+      expect(statusCode).toBe(statusCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    })
   })
 })
