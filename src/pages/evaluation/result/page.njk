@@ -1,0 +1,138 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Evaluation {{ run.run_id }} | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Evaluation Run</h1>
+
+  <dl class="govuk-summary-list govuk-!-margin-bottom-8">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Run ID</dt>
+      <dd class="govuk-summary-list__value govuk-!-font-family-monospace">{{ run.run_id }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Status</dt>
+      <dd class="govuk-summary-list__value">
+        {% if run.status === 'completed' %}
+          <strong class="govuk-tag govuk-tag--green">Completed</strong>
+        {% elif run.status === 'failed' %}
+          <strong class="govuk-tag govuk-tag--red">Failed</strong>
+        {% elif run.status === 'accepted' or run.status === 'in_progress' %}
+          <strong class="govuk-tag govuk-tag--blue">{{ run.status | capitalize }}</strong>
+        {% else %}
+          <strong class="govuk-tag">{{ run.status }}</strong>
+        {% endif %}
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Group ID</dt>
+      <dd class="govuk-summary-list__value">{{ run.group_id }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Snapshot ID</dt>
+      <dd class="govuk-summary-list__value">{{ run.snapshot_id }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Models</dt>
+      <dd class="govuk-summary-list__value">{{ run.models | join(', ') }}</dd>
+    </div>
+  </dl>
+
+  <p class="govuk-body">
+    <a class="govuk-link" href="/evaluation/{{ run.run_id }}/download">Download raw JSON</a>
+  </p>
+
+  {% if run.status !== 'completed' %}
+    <form method="get" action="/evaluation/{{ run.run_id }}">
+      <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
+        Refresh
+      </button>
+    </form>
+  {% endif %}
+
+  {% if run.evaluation_summary and run.evaluation_summary.length %}
+    <h2 class="govuk-heading-l">Evaluation Summary</h2>
+
+    {% for summary in run.evaluation_summary %}
+      <div class="govuk-summary-card govuk-!-margin-bottom-6">
+        <div class="govuk-summary-card__title-wrapper">
+          <h3 class="govuk-summary-card__title">{{ summary.model }}</h3>
+          <div class="govuk-summary-card__actions">
+            {% if summary.passed %}
+              <strong class="govuk-tag govuk-tag--green">Passed</strong>
+            {% else %}
+              <strong class="govuk-tag govuk-tag--red">Failed</strong>
+            {% endif %}
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Average score</dt>
+              <dd class="govuk-summary-list__value">{{ summary.average_score }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Rubric</dt>
+              <dd class="govuk-summary-list__value govuk-body-s">{{ summary.rubric }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if run.results and run.results.length %}
+    <h2 class="govuk-heading-l">Results</h2>
+
+    {% for result in run.results %}
+      <div class="govuk-summary-card govuk-!-margin-bottom-6">
+        <div class="govuk-summary-card__title-wrapper">
+          <h3 class="govuk-summary-card__title">{{ result.question }}</h3>
+          <div class="govuk-summary-card__actions">
+            {% if result.score === 1 %}
+              <strong class="govuk-tag govuk-tag--green">Score: {{ result.score }}</strong>
+            {% elif result.score >= 0.75 %}
+              <strong class="govuk-tag govuk-tag--turquoise">Score: {{ result.score }}</strong>
+            {% elif result.score >= 0.5 %}
+              <strong class="govuk-tag govuk-tag--yellow">Score: {{ result.score }}</strong>
+            {% elif result.score >= 0.25 %}
+              <strong class="govuk-tag govuk-tag--orange">Score: {{ result.score }}</strong>
+            {% else %}
+              <strong class="govuk-tag govuk-tag--red">Score: {{ result.score }}</strong>
+            {% endif %}
+          </div>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Model</dt>
+              <dd class="govuk-summary-list__value">{{ result.model }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Expected answer</dt>
+              <dd class="govuk-summary-list__value">{{ result.expected_answer }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Actual answer</dt>
+              <dd class="govuk-summary-list__value">{{ result.actual_answer }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Reason</dt>
+              <dd class="govuk-summary-list__value">{{ result.reason }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Rubric</dt>
+              <dd class="govuk-summary-list__value govuk-body-s">{{ result.rubric }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    {% endfor %}
+  {% elif run.status === 'completed' %}
+    <p class="govuk-body">No results returned.</p>
+  {% else %}
+    <p class="govuk-body">Results will appear here once the evaluation is complete.</p>
+  {% endif %}
+{% endblock %}

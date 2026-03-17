@@ -227,6 +227,12 @@ const config = convict({
     default: null,
     env: 'BACKEND_RAG_SERVICE_HOST'
   },
+  evaluation_service: {
+    doc: 'The base url for the evaluation service',
+    format: String,
+    default: null,
+    env: 'EVALUATION_SERVICE_HOST'
+  }
 })
 
 config.validate({ allowed: 'strict' })

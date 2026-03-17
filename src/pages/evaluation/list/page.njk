@@ -1,0 +1,52 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Evaluation Runs | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Evaluation Runs</h1>
+    </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+      <a href="/evaluation/run" class="govuk-button" data-module="govuk-button">
+        New evaluation
+      </a>
+    </div>
+  </div>
+
+  {% if runs and runs.length %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">Run ID</th>
+          <th class="govuk-table__header" scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for run in runs %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell govuk-!-font-family-monospace">
+              <a href="/evaluation/{{ run.run_id }}" class="govuk-link">{{ run.run_id }}</a>
+            </td>
+            <td class="govuk-table__cell">
+              {% if run.status === 'completed' %}
+                <strong class="govuk-tag govuk-tag--green">Completed</strong>
+              {% elif run.status === 'failed' %}
+                <strong class="govuk-tag govuk-tag--red">Failed</strong>
+              {% elif run.status === 'accepted' or run.status === 'in_progress' %}
+                <strong class="govuk-tag govuk-tag--blue">{{ run.status | capitalize }}</strong>
+              {% else %}
+                <strong class="govuk-tag">{{ run.status }}</strong>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No evaluation runs found.</p>
+    <a href="/evaluation/run" class="govuk-link">Run your first evaluation</a>
+  {% endif %}
+{% endblock %}
