@@ -1,0 +1,42 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Truth Data Sources | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">Truth Data Sources</h1>
+    </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+      <a href="/truth/create" class="govuk-button" data-module="govuk-button">
+        New truth source
+      </a>
+    </div>
+  </div>
+
+  {% if sources and sources.length %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header" scope="col">ID</th>
+          <th class="govuk-table__header" scope="col">Dataset ID</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for source in sources %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell govuk-!-font-family-monospace">
+              <a href="/truth/{{ source.id }}" class="govuk-link">{{ source.id }}</a>
+            </td>
+            <td class="govuk-table__cell">{{ source.dataset_id }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No truth data sources found.</p>
+    <a href="/truth/create" class="govuk-link">Create your first truth source</a>
+  {% endif %}
+{% endblock %}

@@ -12,3 +12,4 @@ tsconfig.tsbuildinfo
 .env
 CLAUDE.md
 .claude
+.mcp.json
