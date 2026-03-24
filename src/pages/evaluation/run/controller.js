@@ -4,9 +4,7 @@ import * as service from '../../../rag-evaluation/evaluation-service.js'
 const defaultBody = JSON.stringify({
   group_id: '',
   snapshot_id: '',
-  queries: [
-    { query: '', expected_answer: '' }
-  ],
+  truth_source_id: '',
   rubrics: [''],
   models: ['']
 }, null, 2)
