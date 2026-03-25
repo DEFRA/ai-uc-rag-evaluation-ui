@@ -1,0 +1,161 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Configure Evaluation | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Configure Evaluation</h1>
+
+  {% if group %}
+    <p class="govuk-body">Group: <strong>{{ group.title }}</strong></p>
+  {% endif %}
+
+  {% if errors.snapshotId or errors.truthSourceId or errors.rubrics or errors.models %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            {% if errors.snapshotId %}<li><a href="#snapshot_id">{{ errors.snapshotId }}</a></li>{% endif %}
+            {% if errors.truthSourceId %}<li><a href="#truth_source_id">{{ errors.truthSourceId }}</a></li>{% endif %}
+            {% if errors.rubrics %}<li><a href="#rubric_0">{{ errors.rubrics }}</a></li>{% endif %}
+            {% if errors.models %}<li><a href="#models">{{ errors.models }}</a></li>{% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="/evaluation/run/{{ groupId }}">
+    <input type="hidden" name="rubric_count" value="{{ rubrics.length }}">
+
+    <div class="govuk-form-group {% if errors.snapshotId %}govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--m" for="snapshot_id">
+        Snapshot
+      </label>
+      {% if errors.snapshotId %}
+        <p class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.snapshotId }}
+        </p>
+      {% endif %}
+      {% if snapshots.length %}
+        <select class="govuk-select {% if errors.snapshotId %}govuk-select--error{% endif %}" id="snapshot_id" name="snapshot_id">
+          <option value="">Select a snapshot</option>
+          {% for snapshot in snapshots %}
+            <option value="{{ snapshot.snapshot_id }}" {% if snapshot.snapshot_id === snapshotId %}selected{% endif %}>
+              {{ snapshot.snapshot_id }}
+            </option>
+          {% endfor %}
+        </select>
+      {% else %}
+        <p class="govuk-body govuk-hint">No snapshots found for this group.</p>
+        <input type="hidden" name="snapshot_id" value="">
+      {% endif %}
+    </div>
+
+    <div class="govuk-form-group {% if errors.truthSourceId %}govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--m" for="truth_source_id">
+        Truth source
+      </label>
+      {% if errors.truthSourceId %}
+        <p class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.truthSourceId }}
+        </p>
+      {% endif %}
+      {% if truthSources.length %}
+        <select class="govuk-select {% if errors.truthSourceId %}govuk-select--error{% endif %}" id="truth_source_id" name="truth_source_id">
+          <option value="">Select a truth source</option>
+          {% for source in truthSources %}
+            <option value="{{ source.id }}" {% if source.id === truthSourceId %}selected{% endif %}>
+              {{ source.id }}
+            </option>
+          {% endfor %}
+        </select>
+      {% else %}
+        <p class="govuk-body govuk-hint">No truth sources found for this group.</p>
+        <input type="hidden" name="truth_source_id" value="">
+      {% endif %}
+    </div>
+
+    <h2 class="govuk-heading-m">Rubrics</h2>
+
+    {% if errors.rubrics %}
+      <p class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.rubrics }}
+      </p>
+    {% endif %}
+
+    {% for rubric in rubrics %}
+      <div class="govuk-summary-card govuk-!-margin-bottom-4">
+        <div class="govuk-summary-card__title-wrapper">
+          <h3 class="govuk-summary-card__title">Rubric {{ loop.index }}</h3>
+          {% if rubrics.length > 1 %}
+            <ul class="govuk-summary-card__actions">
+              <li class="govuk-summary-card__action">
+                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" name="action" value="delete_rubric_{{ loop.index0 }}">
+                  Delete<span class="govuk-visually-hidden"> rubric {{ loop.index }}</span>
+                </button>
+              </li>
+            </ul>
+          {% endif %}
+        </div>
+        <div class="govuk-summary-card__content">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="rubric_{{ loop.index0 }}">
+              Rubric criteria
+            </label>
+            <textarea
+              class="govuk-textarea govuk-!-font-family-monospace"
+              id="rubric_{{ loop.index0 }}"
+              name="rubric_{{ loop.index0 }}"
+              rows="4"
+            >{{ rubric }}</textarea>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="govuk-button-group govuk-!-margin-bottom-6">
+      <button class="govuk-button govuk-button--secondary" name="action" value="add_rubric">
+        Add another rubric
+      </button>
+    </div>
+
+    <div class="govuk-form-group {% if errors.models %}govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--m" for="models">
+        Models
+      </label>
+      <div id="models-hint" class="govuk-hint">
+        Hold Ctrl (or Cmd on Mac) to select multiple models.
+      </div>
+      {% if errors.models %}
+        <p class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.models }}
+        </p>
+      {% endif %}
+      <select
+        class="govuk-select {% if errors.models %}govuk-select--error{% endif %}"
+        id="models"
+        name="models"
+        multiple
+        size="8"
+        style="height: auto"
+        aria-describedby="models-hint"
+      >
+        {% for model in judgeModels %}
+          <option value="{{ model }}" {% if model in selectedModels %}selected{% endif %}>
+            {{ model }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="govuk-button-group">
+      <button class="govuk-button" name="action" value="submit">
+        Start evaluation
+      </button>
+      <a class="govuk-link" href="/evaluation/run">Change group</a>
+    </div>
+  </form>
+{% endblock %}

@@ -1,5 +1,6 @@
 import * as listController from './list/controller.js'
-import * as runController from './run/controller.js'
+import * as groupController from './run/select-group/controller.js'
+import * as configureController from './run/select-evaluation-config/controller.js'
 import * as resultController from './result/controller.js'
 
 const routes = [
@@ -11,12 +12,22 @@ const routes = [
   {
     method: 'GET',
     path: '/evaluation/run',
-    handler: runController.getEvaluationForm
+    handler: groupController.getGroupForm
   },
   {
     method: 'POST',
     path: '/evaluation/run',
-    handler: runController.submitEvaluation
+    handler: groupController.submitGroup
+  },
+  {
+    method: 'GET',
+    path: '/evaluation/run/{groupId}',
+    handler: configureController.getConfigureForm
+  },
+  {
+    method: 'POST',
+    path: '/evaluation/run/{groupId}',
+    handler: configureController.submitConfigure
   },
   {
     method: 'GET',
