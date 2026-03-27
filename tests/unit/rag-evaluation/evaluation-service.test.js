@@ -47,15 +47,23 @@ describe('listEvaluationRuns', () => {
 
 describe('startEvaluation', () => {
   const requestBody = {
+    groupId: 'kg_1',
+    snapshotId: 'kg_1_v1',
+    truthSourceId: 'truth_1',
+    rubrics: ['Score 0 to 1'],
+    models: ['haiku_3']
+  }
+
+  const expectedApiBody = {
     group_id: 'kg_1',
     snapshot_id: 'kg_1_v1',
-    queries: [{ query: 'What is AI?', expected_answer: 'A field of computer science' }],
+    truth_source_id: 'truth_1',
     rubrics: ['Score 0 to 1'],
     models: ['haiku_3']
   }
 
   test('should return run on success', async () => {
-    const run = { run_id: 'run_1', status: 'accepted', ...requestBody, results: [] }
+    const run = { run_id: 'run_1', status: 'accepted', ...expectedApiBody, results: [] }
     mockFetch.mockResolvedValue(mockResponse(200, run))
 
     const result = await startEvaluation(requestBody)
@@ -65,7 +73,7 @@ describe('startEvaluation', () => {
       expect.stringContaining('/evaluation'),
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(expectedApiBody)
       })
     )
   })

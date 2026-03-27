@@ -79,9 +79,9 @@ async function handleSubmit (h, groupId, payload) {
   }
 
   const result = await evaluationService.startEvaluation({
-    group_id: groupId,
-    snapshot_id: context.snapshotId,
-    truth_source_id: context.truthSourceId,
+    groupId,
+    snapshotId: context.snapshotId,
+    truthSourceId: context.truthSourceId,
     rubrics,
     models: context.selectedModels
   })
