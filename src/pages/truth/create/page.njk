@@ -1,0 +1,88 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Create Truth Data Source | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Create Truth Data Source</h1>
+
+  {% if error %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">There is a problem</h2>
+        <div class="govuk-error-summary__body">
+          <p class="govuk-body">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="/truth/create">
+    <input type="hidden" name="count" value="{{ questionAnswers.length }}">
+
+    <div class="govuk-form-group {% if error %}govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--m" for="dataset_id">
+        Dataset
+      </label>
+      {% if error %}
+        <p class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ error }}
+        </p>
+      {% endif %}
+      <select class="govuk-select" id="dataset_id" name="dataset_id">
+        <option value="">Select a dataset</option>
+        {% for group in groups %}
+          <option value="{{ group.groupId }}" {% if group.groupId === datasetId %}selected{% endif %}>
+            {{ group.title }} ({{ group.groupId }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <h2 class="govuk-heading-m">Question and answer pairs</h2>
+
+    {% for qa in questionAnswers %}
+      <div class="govuk-summary-card govuk-!-margin-bottom-4">
+        <div class="govuk-summary-card__title-wrapper">
+          <h3 class="govuk-summary-card__title">Pair {{ loop.index }}</h3>
+        </div>
+        <div class="govuk-summary-card__content">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="question_{{ loop.index0 }}">
+              Question
+            </label>
+            <input
+              class="govuk-input"
+              id="question_{{ loop.index0 }}"
+              name="question_{{ loop.index0 }}"
+              type="text"
+              value="{{ qa.question }}"
+            >
+          </div>
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="answer_{{ loop.index0 }}">
+              Answer
+            </label>
+            <textarea
+              class="govuk-textarea"
+              id="answer_{{ loop.index0 }}"
+              name="answer_{{ loop.index0 }}"
+              rows="4"
+            >{{ qa.answer }}</textarea>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="govuk-button-group govuk-!-margin-bottom-6">
+      <button class="govuk-button govuk-button--secondary" name="action" value="add">
+        Add another question and answer
+      </button>
+    </div>
+
+    <button class="govuk-button" name="action" value="submit">
+      Create truth source
+    </button>
+  </form>
+{% endblock %}

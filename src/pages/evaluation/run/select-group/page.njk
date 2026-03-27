@@ -1,0 +1,32 @@
+{% extends "common/layout.njk" %}
+
+{% block title %}
+  <title>Run Evaluation | {{ serviceName }}</title>
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Run Evaluation</h1>
+
+  <form method="post" action="/evaluation/run">
+    <div class="govuk-form-group {% if errors.groupId %}govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--m" for="group_id">
+        Select a group
+      </label>
+      {% if errors.groupId %}
+        <p class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.groupId }}
+        </p>
+      {% endif %}
+      <select class="govuk-select {% if errors.groupId %}govuk-select--error{% endif %}" id="group_id" name="group_id">
+        <option value="">Select a group</option>
+        {% for group in groups %}
+          <option value="{{ group.groupId }}">{{ group.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button class="govuk-button" data-module="govuk-button">
+      Continue
+    </button>
+  </form>
+{% endblock %}

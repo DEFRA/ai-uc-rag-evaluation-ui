@@ -16,11 +16,17 @@ async function listEvaluationRuns () {
   return response.json()
 }
 
-async function startEvaluation (body) {
+async function startEvaluation (request) {
   const response = await fetch(`${evaluationService}/evaluation`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    body: JSON.stringify({
+      group_id: request.groupId,
+      snapshot_id: request.snapshotId,
+      truth_source_id: request.truthSourceId,
+      rubrics: request.rubrics,
+      models: request.models
+    })
   })
 
   if (!response.ok) {

@@ -232,6 +232,12 @@ const config = convict({
     format: String,
     default: null,
     env: 'EVALUATION_SERVICE_HOST'
+  },
+  judge_models: {
+    doc: 'List of judge model identifiers available for evaluation',
+    format: Array,
+    default: null,
+    env: 'JUDGE_MODELS'
   }
 })
 
